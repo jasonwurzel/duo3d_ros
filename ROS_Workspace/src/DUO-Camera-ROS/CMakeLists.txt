@@ -14,8 +14,6 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(Boost REQUIRED)
 find_package(PCL REQUIRED)
-#set(DUO_SDK /home/odroid/DUO3D-SDK-v0.5.7.22/SDK)
-#MESSAGE("DUO PATH: " ${DUO_SDK})
 
 # Get DUO_SDK install path from environment variable if set
 if(DEFINED ENV{DUO_SDK})
@@ -25,9 +23,7 @@ else()
 endif()
 
 # Add DUO include and lib
-include_directories(${DUO_SDK}/include)
-include_directories(${PCL_INCLUDE_DIRS})
-# link_directories(${DUO_SDK}/linux/armv7l/ )
+include_directories(${DUO_SDK}/include ${PCL_INCLUDE_DIRS})
 
 # Detect Compiler / Arch and add libraries
 if(MSVC)

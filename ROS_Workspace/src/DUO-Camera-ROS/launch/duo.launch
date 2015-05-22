@@ -20,7 +20,7 @@
 		-->	
 		<param name="FPS"   value="35" />
 
-		<param name="resolution_width"	value="752" />
+		<param name="resolution_width"	value="640" />
 		<param name="resolution_height"	value="480" />
 
 

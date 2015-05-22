@@ -14,12 +14,20 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(Boost REQUIRED)
 find_package(PCL REQUIRED)
-set(DUO_SDK ../../../DUO3D-SDK-v0.5.7.22/SDK)
-MESSAGE("DUO PATH: " ${DUO_SDK})
+#set(DUO_SDK /home/odroid/DUO3D-SDK-v0.5.7.22/SDK)
+#MESSAGE("DUO PATH: " ${DUO_SDK})
+
+# Get DUO_SDK install path from environment variable if set
+if(DEFINED ENV{DUO_SDK})
+  set(DUO_SDK $ENV{DUO_SDK} )
+else()
+  set(DUO_SDK ${CMAKE_CURRENT_SOURCE_DIR}/../SDK)
+endif()
 
 # Add DUO include and lib
-include_directories(${DUO_SDK}/include ${PCL_INCLUDE_DIRS} )
-link_directories(${DUO_SDK}/linux/x64/ )
+include_directories(${DUO_SDK}/include)
+include_directories(${PCL_INCLUDE_DIRS})
+# link_directories(${DUO_SDK}/linux/armv7l/ )
 
 # Detect Compiler / Arch and add libraries
 if(MSVC)
@@ -46,6 +54,9 @@ elseif(APPLE)
 elseif(UNIX)
   if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(DUOLib_ARCH x64)
+message(STREQAL WORKED)
+ elseif( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "armv7l")
+    set(DUOLib_ARCH armv7l)
   else()
     set(DUOLib_ARCH x86)
   endif()

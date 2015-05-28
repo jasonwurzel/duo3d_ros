@@ -13,6 +13,8 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/Imu.h>
+#include <sensor_msgs/MagneticField.h>
+#include <sensor_msgs/Temperature.h>
 #include <image_transport/image_transport.h>
 #include <camera_info_manager/camera_info_manager.h>
 #include "duo3d_ros/Duo3d.h"
@@ -164,6 +166,8 @@ private:
 
 	ros::Publisher _pub;
   ros::Publisher _combined_pub;
+  ros::Publisher _mag_pub;
+  ros::Publisher _temp_pub;
 
 	/*
 	* 	@brief 
@@ -209,6 +213,10 @@ private:
 	void publishImuData(const sensor_msgs::Imu &img_msg);
 
   void publishCombinedData(const duo3d_ros::Duo3d &combined_msg);
+
+  void publishMagData(const sensor_msgs::MagneticField &mag_msg);
+  
+  void publishTempData(const sensor_msgs::Temperature &temp_msg);
 
 	/* 
 	 * 	@brief

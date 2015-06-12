@@ -1,0 +1,10 @@
+<launch>
+
+    <node name="stereo_image_proc" pkg="stereo_image_proc" type="stereo_image_proc" >
+      <remap from="/left/image_raw" to="/duo3d_camera/left/image_raw"/>
+      <remap from="/right/image_raw" to="/duo3d_camera/right/image_raw"/>
+      <remap from="/left/camera_info" to="/duo3d_camera/left/camera_info"/>
+      <remap from="/right/camera_info" to="/duo3d_camera/right/camera_info"/>
+    </node>
+
+</launch>

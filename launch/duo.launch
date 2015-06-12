@@ -24,7 +24,7 @@
 		<param name="resolution_height"	value="480" />
 
 
-		<param name="exposure"		value="100"  />
+		<param name="exposure"		value="50"  />
 		<param name="gain"		value="160"  /> 
 		<param name="led_lighting"	value="0"  />
 

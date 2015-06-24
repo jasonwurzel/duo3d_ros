@@ -36,6 +36,7 @@ DUOStereoDriver::DUOStereoDriver(void):
 	}
 
 	_pub = _camera_nh.advertise<sensor_msgs::Imu>("cam_imu", 5);
+	_combined_pub =_camera_nh.advertise<duo3d_ros::Duo3d>("combined", 1);
 }
 
 
@@ -143,7 +144,6 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
     // Then publish the images
     //duoDriver.fillDUOImages(*image[duoDriver.LEFT_CAM], *image[duoDriver.RIGHT_CAM], pFrameData);
     duoDriver.fillDUOImages(*image[1], *image[0], pFrameData);
-    duoDriver.publishImages(image);
 
 
     /*--------------------------------------------------------*/
@@ -159,7 +159,20 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 
     img_msg.header.stamp = ros::Time( double(pFrameData->timeStamp) * 1.e-4);
 
+    duo3d_ros::Duo3d combined_msg;
+    combined_msg.header = img_msg.header;
+    combined_msg.imu = img_msg;
+    combined_msg.left_image = *image[1];
+    combined_msg.right_image = *image[0];
+
+    duoDriver.publishCombinedData(combined_msg);
+    duoDriver.publishImages(image);
     duoDriver.publishImuData(img_msg);
+}
+
+void DUOStereoDriver::publishCombinedData(const duo3d_ros::Duo3d &combined_msg)
+{
+    _combined_pub.publish(combined_msg);
 }
 
 void DUOStereoDriver::publishImuData(const sensor_msgs::Imu &img_msg)

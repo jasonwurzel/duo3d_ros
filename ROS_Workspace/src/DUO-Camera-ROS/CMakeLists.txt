@@ -10,6 +10,8 @@ find_package(catkin REQUIRED COMPONENTS
   image_transport
   dynamic_reconfigure
   pcl_ros
+  sensor_msgs
+  message_generation
 )
 
 find_package(Boost REQUIRED)
@@ -63,7 +65,18 @@ generate_dynamic_reconfigure_options(
   cfg/Duo.cfg
 )
 
-catkin_package( CATKIN_DEPENDS geometry_msgs roscpp tf)
+add_message_files(
+  FILES
+  Duo3d.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  sensor_msgs
+)
+
+catkin_package( CATKIN_DEPENDS geometry_msgs roscpp tf message_runtime)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
@@ -71,7 +84,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(duo_node src/driverDUOstereo.cpp src/node.cpp)
 #add_executable(dense3d src/duo_dense3d.cpp)
 
-add_dependencies(duo_node ${PROJECT_NAME}_gencfg)
+add_dependencies(duo_node ${PROJECT_NAME}_gencfg ${PROJECT_NAME}_generate_messages_cpp)
 
 # for linking duo_node to dynamic_reconfigure cfg files
 

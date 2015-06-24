@@ -20,8 +20,8 @@
 		-->	
 		<param name="FPS"   value="35" />
 
-		<param name="resolution_width"	value="752" />
-		<param name="resolution_height"	value="480" />
+		<param name="resolution_width"	value="320" />
+		<param name="resolution_height"	value="240" />
 
 
 		<param name="exposure"		value="50"  />
@@ -33,8 +33,8 @@
 
 	    <!-- NOTE: to set the calibration manually you'll need to have the "ost.txt" file from the ros calibration. then you convert (use http://wiki.ros.org/camera_calibration_parsers) it to two separate files and put it into the calibration folder -->
 
-	    <param name="camera_info_left" value="file://$(find duo3d_ros)/calibration/duo3d_left.yaml" />
-	    <param name="camera_info_right" value="file://$(find duo3d_ros)/calibration/duo3d_right.yaml" />
+	    <param name="camera_info_left" value="file://$(find duo3d_ros)/calibration/duo3d_left_320_240.yaml" />
+	    <param name="camera_info_right" value="file://$(find duo3d_ros)/calibration/duo3d_right_320_240.yaml" />
     </node>
 
     <node name="stereo_image_proc" pkg="stereo_image_proc" type="stereo_image_proc" >

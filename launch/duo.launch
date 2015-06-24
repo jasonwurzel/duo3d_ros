@@ -20,8 +20,8 @@
 		-->	
 		<param name="FPS"   value="35" />
 
-		<param name="resolution_width"	value="640" />
-		<param name="resolution_height"	value="480" />
+		<param name="resolution_width"	value="320" />
+		<param name="resolution_height"	value="240" />
 
 
 		<param name="exposure"		value="50"  />

@@ -145,7 +145,7 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
     // Dereferencing individual images to fill with pFrameData from camera
     // Then publish the images
     //duoDriver.fillDUOImages(*image[duoDriver.LEFT_CAM], *image[duoDriver.RIGHT_CAM], pFrameData);
-    duoDriver.fillDUOImages(*image[1], *image[0], pFrameData);
+    duoDriver.fillDUOImages(*image[1], *image[0], pFrameData); //we had to swich the image 
 
 
     /*--------------------------------------------------------*/
@@ -164,8 +164,8 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
     duo3d_ros::Duo3d combined_msg;
     combined_msg.header = img_msg.header;
     combined_msg.imu = img_msg;
-    combined_msg.left_image = *image[1];
-    combined_msg.right_image = *image[0];
+    combined_msg.left_image = *image[0];
+    combined_msg.right_image = *image[1];
 
     duoDriver.publishCombinedData(combined_msg);
     duoDriver.publishImages(image);

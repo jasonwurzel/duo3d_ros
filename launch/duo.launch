@@ -1,7 +1,10 @@
 <launch>
 
-    <arg name="exposure" default="50" />
-    <arg name="gain" default="50" />
+    <arg name="exposure" default="100" />
+    <arg name="gain" default="100" />
+    <arg name="FPS" default="60" />
+    <arg name="resolution_width" default="320" />
+    <arg name="resolution_height" default="240" />
 
 
     <node pkg="duo3d_ros" name="duo_node" type="duo_node" required="true" output="screen">
@@ -23,10 +26,10 @@
 		360 FPS @ 320x120
 
 		-->	
-		<param name="FPS"   value="35" />
+		<param name="FPS"   value="$(arg FPS)" />
 
-		<param name="resolution_width"	value="752" />
-		<param name="resolution_height"	value="480" />
+		<param name="resolution_width"	value="$(arg resolution_width)" />
+		<param name="resolution_height"	value="$(arg resolution_height)" />
 
 
 		<param name="exposure"		value="$(arg exposure)"  />

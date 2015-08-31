@@ -137,9 +137,9 @@ private:
 	double 	_duoExposure;
 	double	_duoGain;
 	double 	_duoLEDLevel;
-	int 	_duoCameraSwap;
-	int 	_duoHorizontalFlip;
-	int 	_duoVerticalFlip;
+	bool 	_duoCameraSwap;
+	bool 	_duoHorizontalFlip;
+	bool 	_duoVerticalFlip;
 
 	/*
 	 *	@params for whether or not to use IMU and/or LED sequences

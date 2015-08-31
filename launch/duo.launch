@@ -41,6 +41,7 @@
 
 	    <param name="VerticalFlip"   	value="true" />
 	    <param name="HorizontalFlip"   	value="true" />
+	    <param name="CameraSwap"     	value="false" />
 
 	    <!-- NOTE: to set the calibration manually you'll need to have the "ost.txt" file from the ros calibration. then you convert (use http://wiki.ros.org/camera_calibration_parsers) it to two separate files and put it into the calibration folder -->
 

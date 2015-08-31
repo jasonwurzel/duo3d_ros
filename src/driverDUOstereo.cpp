@@ -316,6 +316,7 @@ bool DUOStereoDriver::initializeDUO()
 
 	_priv_nh.param<bool>("HorizontalFlip", _horizontal_flip, false);
 	_priv_nh.param<bool>("VerticalFlip", _vertical_flip, false);
+	_priv_nh.param<bool>("CameraSwap", _duoCameraSwap, false);
 
 
 	/*
@@ -344,7 +345,7 @@ bool DUOStereoDriver::initializeDUO()
 			SetDUOExposure(_duoInstance, _duoExposure);
 			SetDUOGain(_duoInstance, _duoGain);
 			SetDUOLedPWM(_duoInstance, _duoLEDLevel);
-			SetDUOCameraSwap(_duoInstance, 1); // Switches left and right images
+			SetDUOCameraSwap(_duoInstance, _duoCameraSwap); // Switches left and right images
 //			SetDUOIMURange(_duoInstance, 100, 100);
 
 		}

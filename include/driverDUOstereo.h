@@ -144,8 +144,10 @@ private:
 	/*
 	 *	@params for whether or not to use IMU and/or LED sequences
 	 */
-	bool 	_useDUO_Imu;
+	bool	_useDUO_Imu;
 	bool	_useDUO_LEDs;
+	bool	_horizontal_flip;
+	bool	_vertical_flip;
 
 
 	/*

@@ -314,6 +314,9 @@ bool DUOStereoDriver::initializeDUO()
 		ROS_WARN("Will continue to publish uncalibrated images!");
 	}
 
+	_priv_nh.param<bool>("HorizontalFlip", _horizontal_flip, false);
+	_priv_nh.param<bool>("VerticalFlip", _vertical_flip, false);
+
 
 	/*
 	 * @brief
@@ -342,6 +345,7 @@ bool DUOStereoDriver::initializeDUO()
 			SetDUOGain(_duoInstance, _duoGain);
 			SetDUOLedPWM(_duoInstance, _duoLEDLevel);
 			SetDUOCameraSwap(_duoInstance, 1); // Switches left and right images
+//			SetDUOIMURange(_duoInstance, 100, 100);
 
 		}
 		else

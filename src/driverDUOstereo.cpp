@@ -346,7 +346,9 @@ bool DUOStereoDriver::initializeDUO()
 			SetDUOGain(_duoInstance, _duoGain);
 			SetDUOLedPWM(_duoInstance, _duoLEDLevel);
 			SetDUOCameraSwap(_duoInstance, _duoCameraSwap); // Switches left and right images
-//			SetDUOIMURange(_duoInstance, 100, 100);
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(3, 13, 0)
+			SetDUOIMURange(_duoInstance, DUO_ACCEL_16G, DUO_GYRO_2000);
+#endif
 
 		}
 		else

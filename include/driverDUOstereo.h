@@ -22,6 +22,7 @@
 #include <dynamic_reconfigure/server.h>
 #include <duo3d_ros/DuoConfig.h>
 
+#include <linux/version.h>
 
 namespace duoStereo_driver
 {

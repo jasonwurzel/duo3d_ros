@@ -19,12 +19,13 @@ const std::string DUOStereoDriver::CameraNames[TWO_CAMERAS] = {"left","right"};
 
 
 DUOStereoDriver::DUOStereoDriver(void):
-	 _useDUO_Imu(false),
-	_useDUO_LEDs(false),
-	    _priv_nh("~"),
-	  _camera_nh("duo3d_camera"),
-	_camera_name("duo_camera"),
-	         _it(new image_transport::ImageTransport(_camera_nh))
+			 _useDUO_Imu(false),
+			 _useDUO_LEDs(false),
+			 _priv_nh("~"),
+			 _camera_nh("duo3d_camera"),
+			 _camera_name("duo_camera"),
+			 _it(new image_transport::ImageTransport(_camera_nh)),
+			 msgs_in_queue(0)
 {
 	for(int i = 0; i < TWO_CAMERAS; i++)
 	{
@@ -36,9 +37,12 @@ DUOStereoDriver::DUOStereoDriver(void):
 	}
 
 	_pub = _camera_nh.advertise<sensor_msgs::Imu>("cam_imu", 5);
-	_combined_pub =_camera_nh.advertise<duo3d_ros::Duo3d>("combined", 1);
+	_combined_pub =_camera_nh.advertise<duo3d_ros::Duo3d>("combined", 100);
 	_mag_pub = _camera_nh.advertise<sensor_msgs::MagneticField>("cam_mag",1);
 	_temp_pub = _camera_nh.advertise<sensor_msgs::Temperature>("cam_temp",1);
+
+	_msg_processed_sub = _camera_nh.subscribe("/vio/msg_processed",1,
+			&DUOStereoDriver::msgProcessedCb, this);
 }
 
 
@@ -194,6 +198,18 @@ void DUOStereoDriver::publishMagData(const sensor_msgs::MagneticField &mag_msg)
 void DUOStereoDriver::publishCombinedData(const duo3d_ros::Duo3d &combined_msg)
 {
     _combined_pub.publish(combined_msg);
+    if (_combined_pub.getNumSubscribers())
+    {
+    	msgs_in_queue++;
+    	if (!has_subscriber)
+    		ROS_INFO("DUO3d found subscriber");
+    	has_subscriber = true;
+    } else {
+    	msgs_in_queue = 0;
+    	if (has_subscriber)
+    		ROS_WARN("DUO3d has lost the subscriber");
+    	has_subscriber = false;
+    }
 }
 
 void DUOStereoDriver::publishImuData(const sensor_msgs::Imu &img_msg)
@@ -412,7 +428,12 @@ void DUOStereoDriver::dynamicCallback(duo3d_ros::DuoConfig &config, uint32_t lev
 
 }
 
-
+void DUOStereoDriver::msgProcessedCb(const std_msgs::Int32 &msg)
+{
+	msgs_in_queue--;
+	if (msgs_in_queue > msg.data)
+		ROS_WARN("DUO3d queue overflow! Sent %d messages, queue size is %d", msgs_in_queue, msg.data);
+}
 void DUOStereoDriver::setup(void)
 {
 	_serverCbType = boost::bind(&DUOStereoDriver::dynamicCallback, this, _1, _2);

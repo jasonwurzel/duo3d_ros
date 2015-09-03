@@ -5,12 +5,13 @@
 //	File:	driverDUOstereo.cpp
 //
 ////////////////////////////////////////////////////////////////////
- 
+
 #ifndef DUOCamera_StereoDriver_h
 #define DUOCamera_StereoDriver_h
 
 #include <DUOLib.h>
 #include <ros/ros.h>
+#include <std_msgs/Int32.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/MagneticField.h>
@@ -84,9 +85,9 @@ public:
 	 *						with OpenDUO() DUO API function call.
 	 *	startDUO():			Simply calls the DUO API StartDUO() function call.
 	 *	shutdownDUO():		Using the DUO API function calls to properly end connection
- 	 * 						with DUO camera. This should ONLY be called, if the ros node 
- 	 * 						receives a shutdown signal; so this is called in the 
- 	 * 						DestroyInstance() if the pSingleton instance is not NULL.
+	 * 						with DUO camera. This should ONLY be called, if the ros node
+	 * 						receives a shutdown signal; so this is called in the
+	 * 						DestroyInstance() if the pSingleton instance is not NULL.
 	 */
 	bool initializeDUO(void);
 	void startDUO(void);
@@ -150,6 +151,9 @@ private:
 	bool	_horizontal_flip;
 	bool	_vertical_flip;
 
+	int msgs_in_queue;
+	bool has_subscriber;
+
 
 	/*
 	 * 	@priv_nh: 		used for grabbing params for launch files configs
@@ -168,22 +172,23 @@ private:
 	std::string 	_camera_frame;
 
 	ros::Publisher _pub;
-  ros::Publisher _combined_pub;
-  ros::Publisher _mag_pub;
-  ros::Publisher _temp_pub;
+	ros::Publisher _combined_pub;
+	ros::Publisher _mag_pub;
+	ros::Publisher _temp_pub;
+	ros::Subscriber _msg_processed_sub;
 
 	/*
-	* 	@brief 
-	*	Fills the ros image msg's with the DUO frame buffer data
-	*/
+	 * 	@brief
+	 *	Fills the ros image msg's with the DUO frame buffer data
+	 */
 	void fillDUOImages(		sensor_msgs::Image& leftImage, 
-							sensor_msgs::Image& rightImage, 
-							const PDUOFrame pFrameData);
+			sensor_msgs::Image& rightImage,
+			const PDUOFrame pFrameData);
 
 	/*
- 	 * 	@brief 
- 	 * 	Checking if the camerainfo we received from camera_info_manager is the same as the image
- 	 * 	we are about to send.
+	 * 	@brief
+	 * 	Checking if the camerainfo we received from camera_info_manager is the same as the image
+	 * 	we are about to send.
 	 *	
 	 *	@WARN
 	 *	Notify user if camera info and user specified camera settings are different, and that we
@@ -215,11 +220,11 @@ private:
 
 	void publishImuData(const sensor_msgs::Imu &img_msg);
 
-  void publishCombinedData(const duo3d_ros::Duo3d &combined_msg);
+	void publishCombinedData(const duo3d_ros::Duo3d &combined_msg);
 
-  void publishMagData(const sensor_msgs::MagneticField &mag_msg);
-  
-  void publishTempData(const sensor_msgs::Temperature &temp_msg);
+	void publishMagData(const sensor_msgs::MagneticField &mag_msg);
+
+	void publishTempData(const sensor_msgs::Temperature &temp_msg);
 
 	/* 
 	 * 	@brief
@@ -239,6 +244,8 @@ private:
 
 
 	static DUOStereoDriver* pSingleton;
+
+	void msgProcessedCb(const std_msgs::Int32 &msg);
 };
 
 }

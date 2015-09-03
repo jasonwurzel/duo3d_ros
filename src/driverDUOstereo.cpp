@@ -41,7 +41,7 @@ DUOStereoDriver::DUOStereoDriver(void):
 	_mag_pub = _camera_nh.advertise<sensor_msgs::MagneticField>("cam_mag",1);
 	_temp_pub = _camera_nh.advertise<sensor_msgs::Temperature>("cam_temp",1);
 
-	_msg_processed_sub = _camera_nh.subscribe("/vio/msg_processed",1,
+	_msg_processed_sub = _camera_nh.subscribe("/vio/msg_processed",100,
 			&DUOStereoDriver::msgProcessedCb, this);
 }
 

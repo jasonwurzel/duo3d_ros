@@ -214,6 +214,7 @@ void DUOStereoDriver::publishCombinedData(const duo3d_ros::Duo3d &combined_msg)
 			has_subscriber = false;
 		}
 	}
+	ROS_INFO("%d messages in queue", msgs_in_queue);
 	if (msgs_in_queue > 10)
 		ROS_WARN("DUO3d queue very long! Published %d unread messages", msgs_in_queue;
 	if (msgs_in_queue > msg.data)

@@ -202,14 +202,22 @@ void DUOStereoDriver::publishCombinedData(const duo3d_ros::Duo3d &combined_msg)
 	{
 		msgs_in_queue++;
 		if (!has_subscriber)
+		{
 			ROS_INFO("DUO3d found subscriber");
-		has_subscriber = true;
+			has_subscriber = true;
+		}
 	} else {
 		msgs_in_queue = 0;
 		if (has_subscriber)
+		{
 			ROS_WARN("DUO3d has lost the subscriber");
-		has_subscriber = false;
+			has_subscriber = false;
+		}
 	}
+	if (msgs_in_queue > 10)
+		ROS_WARN("DUO3d queue very long! Published %d unread messages", msgs_in_queue;
+	if (msgs_in_queue > msg.data)
+		ROS_WARN("DUO3d queue overflow! Published %d unread messages", msgs_in_queue);
 }
 
 void DUOStereoDriver::publishImuData(const sensor_msgs::Imu &img_msg)
@@ -431,10 +439,6 @@ void DUOStereoDriver::dynamicCallback(duo3d_ros::DuoConfig &config, uint32_t lev
 void DUOStereoDriver::msgProcessedCb(const std_msgs::Int32 &msg)
 {
 	msgs_in_queue--;
-	if (msgs_in_queue > 10)
-		ROS_WARN("DUO3d queue very long! %d messages, queue size is %d", msgs_in_queue, msg.data);
-	if (msgs_in_queue > msg.data)
-		ROS_WARN("DUO3d queue overflow! Sent %d messages, queue size is %d", msgs_in_queue, msg.data);
 }
 void DUOStereoDriver::setup(void)
 {

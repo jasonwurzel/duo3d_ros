@@ -25,7 +25,8 @@ DUOStereoDriver::DUOStereoDriver(void):
 					 _camera_nh("duo3d_camera"),
 					 _camera_name("duo_camera"),
 					 _it(new image_transport::ImageTransport(_camera_nh)),
-					 msgs_in_queue(0)
+					 msgs_in_queue(0),
+					 queue_size(0)
 {
 	for(int i = 0; i < TWO_CAMERAS; i++)
 	{
@@ -200,7 +201,9 @@ void DUOStereoDriver::publishCombinedData(const duo3d_ros::Duo3d &combined_msg)
 	_combined_pub.publish(combined_msg);
 	if (_combined_pub.getNumSubscribers())
 	{
-		msgs_in_queue++;
+		if (msgs_in_queue < queue_size || queue_size == 0)
+			msgs_in_queue++;
+
 		if (!has_subscriber)
 		{
 			ROS_INFO("DUO3d found subscriber");
@@ -214,11 +217,10 @@ void DUOStereoDriver::publishCombinedData(const duo3d_ros::Duo3d &combined_msg)
 			has_subscriber = false;
 		}
 	}
-	ROS_INFO("%d messages in queue", msgs_in_queue);
 	if (msgs_in_queue > 10)
 		ROS_WARN("DUO3d queue very long! Published %d unread messages", msgs_in_queue);
-//	if (msgs_in_queue > msg.data)
-//		ROS_WARN("DUO3d queue overflow! Published %d unread messages", msgs_in_queue);
+	else if (msgs_in_queue > queue_size && queue_size > 0)
+		ROS_ERROR("DUO3d queue overflow! Published %d unread messages", msgs_in_queue);
 }
 
 void DUOStereoDriver::publishImuData(const sensor_msgs::Imu &img_msg)
@@ -440,6 +442,8 @@ void DUOStereoDriver::dynamicCallback(duo3d_ros::DuoConfig &config, uint32_t lev
 void DUOStereoDriver::msgProcessedCb(const std_msgs::Int32 &msg)
 {
 	msgs_in_queue--;
+	if (queue_size == 0)
+		queue_size = msg.data;
 }
 void DUOStereoDriver::setup(void)
 {

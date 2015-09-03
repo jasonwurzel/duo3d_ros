@@ -152,6 +152,7 @@ private:
 	bool	_vertical_flip;
 
 	int msgs_in_queue;
+	int queue_size;
 	bool has_subscriber;
 
 

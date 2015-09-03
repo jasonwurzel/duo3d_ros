@@ -216,9 +216,9 @@ void DUOStereoDriver::publishCombinedData(const duo3d_ros::Duo3d &combined_msg)
 	}
 	ROS_INFO("%d messages in queue", msgs_in_queue);
 	if (msgs_in_queue > 10)
-		ROS_WARN("DUO3d queue very long! Published %d unread messages", msgs_in_queue;
-	if (msgs_in_queue > msg.data)
-		ROS_WARN("DUO3d queue overflow! Published %d unread messages", msgs_in_queue);
+		ROS_WARN("DUO3d queue very long! Published %d unread messages", msgs_in_queue);
+//	if (msgs_in_queue > msg.data)
+//		ROS_WARN("DUO3d queue overflow! Published %d unread messages", msgs_in_queue);
 }
 
 void DUOStereoDriver::publishImuData(const sensor_msgs::Imu &img_msg)

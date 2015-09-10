@@ -173,7 +173,6 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 	combined_msg.right_image = *image[1];
 
 	duoDriver.publishCombinedData(combined_msg);
-	duoDriver.publishImages(image);
 
 	sensor_msgs::MagneticField mag_msg;
 	mag_msg.magnetic_field.x = pFrameData->magData[0];
@@ -186,9 +185,13 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 	temp_msg.temperature = pFrameData->tempData;
 	temp_msg.header.stamp = ros::Time(double(pFrameData->timeStamp) * 1.e-4);
 
-	duoDriver.publishImuData(img_msg);
-	duoDriver.publishMagData(mag_msg);
-	duoDriver.publishTempData(temp_msg);
+	if (duoDriver._publish_raw)
+	{
+		duoDriver.publishImages(image);
+		duoDriver.publishImuData(img_msg);
+		duoDriver.publishMagData(mag_msg);
+		duoDriver.publishTempData(temp_msg);
+	}
 }
 
 void DUOStereoDriver::publishMagData(const sensor_msgs::MagneticField &mag_msg)
@@ -306,7 +309,6 @@ bool DUOStereoDriver::initializeDUO()
 		binning += DUO_BIN_VERTICAL4;
 	else if(resHeight <= 480/2)
 		binning += DUO_BIN_VERTICAL2;
-
 	/*
 	 * @brief
 	 * Grab bool for whether user wants to use IMU &/or LED's
@@ -344,7 +346,7 @@ bool DUOStereoDriver::initializeDUO()
 	_priv_nh.param<bool>("HorizontalFlip", _horizontal_flip, false);
 	_priv_nh.param<bool>("VerticalFlip", _vertical_flip, false);
 	_priv_nh.param<bool>("CameraSwap", _duoCameraSwap, false);
-
+	_priv_nh.param<bool>("publish_raw", _publish_raw, false);
 
 	/*
 	 * @brief

@@ -154,6 +154,7 @@ private:
 	int msgs_in_queue;
 	int queue_size;
 	bool has_subscriber;
+	bool _publish_raw;
 
 
 	/*

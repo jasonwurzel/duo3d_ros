@@ -1,10 +1,11 @@
 <launch>
 
-    <arg name="exposure" default="100" />
+    <arg name="exposure" default="50" />
     <arg name="gain" default="100" />
-    <arg name="FPS" default="60" />
-    <arg name="resolution_width" default="320" />
-    <arg name="resolution_height" default="240" />
+    <arg name="FPS" default="30" />
+    <arg name="resolution_width" default="480" />
+    <arg name="resolution_height" default="320" />
+    <arg name="publish_raw" default="0" />
 
 
     <node pkg="duo3d_ros" name="duo_node" type="duo_node" required="true" output="screen">
@@ -42,6 +43,8 @@
 	    <param name="VerticalFlip"   	value="false" />
 	    <param name="HorizontalFlip"   	value="false" />
 	    <param name="CameraSwap"     	value="true" />
+	    
+	    <param name="publish_raw" type="bool" value="$(arg publish_raw)" />
 
 	    <!-- NOTE: to set the calibration manually you'll need to have the "ost.txt" file from the ros calibration. then you convert (use http://wiki.ros.org/camera_calibration_parsers) it to two separate files and put it into the calibration folder -->
 

@@ -25,8 +25,7 @@ DUOStereoDriver::DUOStereoDriver(void):
 					 _camera_nh("duo3d_camera"),
 					 _camera_name("duo_camera"),
 					 _it(new image_transport::ImageTransport(_camera_nh)),
-					 msgs_in_queue(0),
-					 queue_size(0)
+					 msg_cnt(0)
 {
 	for(int i = 0; i < TWO_CAMERAS; i++)
 	{
@@ -42,7 +41,7 @@ DUOStereoDriver::DUOStereoDriver(void):
 	_mag_pub = _camera_nh.advertise<sensor_msgs::MagneticField>("cam_mag",1);
 	_temp_pub = _camera_nh.advertise<sensor_msgs::Temperature>("cam_temp",1);
 
-	_msg_processed_sub = _camera_nh.subscribe("/vio/msg_processed",100,
+	_msg_processed_sub = _camera_nh.subscribe("/duo3d/msg_processed",100,
 			&DUOStereoDriver::msgProcessedCb, this);
 }
 
@@ -171,8 +170,8 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 	combined_msg.imu = img_msg;
 	combined_msg.left_image = *image[0];
 	combined_msg.right_image = *image[1];
-
 	duoDriver.publishCombinedData(combined_msg);
+	duoDriver.msg_cnt++;
 
 	sensor_msgs::MagneticField mag_msg;
 	mag_msg.magnetic_field.x = pFrameData->magData[0];
@@ -202,28 +201,7 @@ void DUOStereoDriver::publishMagData(const sensor_msgs::MagneticField &mag_msg)
 void DUOStereoDriver::publishCombinedData(const duo3d_ros::Duo3d &combined_msg)
 {
 	_combined_pub.publish(combined_msg);
-	if (_combined_pub.getNumSubscribers())
-	{
-		if (msgs_in_queue < queue_size || queue_size == 0)
-			msgs_in_queue++;
-
-		if (!has_subscriber)
-		{
-			ROS_INFO("DUO3d found subscriber");
-			has_subscriber = true;
-		}
-	} else {
-		msgs_in_queue = 0;
-		if (has_subscriber)
-		{
-			ROS_WARN("DUO3d has lost the subscriber");
-			has_subscriber = false;
-		}
-	}
-	if (msgs_in_queue > 10)
-		ROS_WARN("DUO3d queue very long! Published %d unread messages", msgs_in_queue);
-	else if (msgs_in_queue > queue_size && queue_size > 0)
-		ROS_ERROR("DUO3d queue overflow! Published %d unread messages", msgs_in_queue);
+//	ROS_INFO("Sending message %d", combined_msg.id.data);
 }
 
 void DUOStereoDriver::publishImuData(const sensor_msgs::Imu &img_msg)
@@ -441,11 +419,11 @@ void DUOStereoDriver::dynamicCallback(duo3d_ros::DuoConfig &config, uint32_t lev
 
 }
 
-void DUOStereoDriver::msgProcessedCb(const std_msgs::Int32 &msg)
+void DUOStereoDriver::msgProcessedCb(const std_msgs::UInt32 &msg)
 {
-	msgs_in_queue--;
-	if (queue_size == 0)
-		queue_size = msg.data;
+	unsigned int diff = msg_cnt - msg.data;
+	if (diff > 10)
+		ROS_WARN("DUO3d queue very long! Subscriber is %d messages behind", diff);
 }
 void DUOStereoDriver::setup(void)
 {

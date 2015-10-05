@@ -11,7 +11,7 @@
 
 #include <DUOLib.h>
 #include <ros/ros.h>
-#include <std_msgs/Int32.h>
+#include <std_msgs/UInt32.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/MagneticField.h>
@@ -151,10 +151,9 @@ private:
 	bool	_horizontal_flip;
 	bool	_vertical_flip;
 
-	int msgs_in_queue;
-	int queue_size;
-	bool has_subscriber;
 	bool _publish_raw;
+
+	unsigned int msg_cnt;
 
 
 	/*
@@ -247,7 +246,7 @@ private:
 
 	static DUOStereoDriver* pSingleton;
 
-	void msgProcessedCb(const std_msgs::Int32 &msg);
+	void msgProcessedCb(const std_msgs::UInt32 &msg);
 };
 
 }

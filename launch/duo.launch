@@ -1,10 +1,10 @@
 <launch>
 
-    <arg name="exposure" default="50" />
+    <arg name="exposure" default="100" />
     <arg name="gain" default="100" />
-    <arg name="FPS" default="30" />
-    <arg name="resolution_width" default="480" />
-    <arg name="resolution_height" default="320" />
+    <arg name="FPS" default="100" />
+    <arg name="resolution_width" default="320" />
+    <arg name="resolution_height" default="240" />
     <arg name="publish_raw" default="0" />
 
 

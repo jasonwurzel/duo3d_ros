@@ -2,7 +2,7 @@
 
     <arg name="exposure" default="100" />
     <arg name="gain" default="100" />
-    <arg name="FPS" default="100" />
+    <arg name="FPS" default="80" />
     <arg name="resolution_width" default="320" />
     <arg name="resolution_height" default="240" />
     <arg name="publish_raw" default="0" />
@@ -40,8 +40,8 @@
 	    <param name="use_DUO_imu"   	value="true" />
 	    <param name="use_DUO_LEDs"   	value="true" />
 
-	    <param name="VerticalFlip"   	value="false" />
-	    <param name="HorizontalFlip"   	value="false" />
+	    <param name="VerticalFlip"   	value="true" />
+	    <param name="HorizontalFlip"   	value="true" />
 	    <param name="CameraSwap"     	value="true" />
 	    
 	    <param name="publish_raw" type="bool" value="$(arg publish_raw)" />

@@ -304,22 +304,22 @@ bool DUOStereoDriver::initializeDUO()
 
 
 	// set camera_info_url using launch file
-	std::string camera_info_url_left, camera_info_url_right;
-	_priv_nh.param<std::string>("camera_info_left", camera_info_url_left, "");
-	_priv_nh.param<std::string>("camera_info_right", camera_info_url_right, "");
-
-	if( _cinfo[0]->validateURL( camera_info_url_left ) && _cinfo[1]->validateURL( camera_info_url_right ) )
-	{
-		_cinfo[0]->loadCameraInfo( camera_info_url_left );
-		_cinfo[1]->loadCameraInfo( camera_info_url_right );
-
-		ROS_INFO("custom DUO calibration files loaded");
-	}
-	else
-	{
-		ROS_ERROR("Calibration URL is invalid.");
-		ROS_WARN("Will continue to publish uncalibrated images!");
-	}
+//	std::string camera_info_url_left, camera_info_url_right;
+//	_priv_nh.param<std::string>("camera_info_left", camera_info_url_left, "");
+//	_priv_nh.param<std::string>("camera_info_right", camera_info_url_right, "");
+//
+//	if( _cinfo[0]->validateURL( camera_info_url_left ) && _cinfo[1]->validateURL( camera_info_url_right ) )
+//	{
+//		_cinfo[0]->loadCameraInfo( camera_info_url_left );
+//		_cinfo[1]->loadCameraInfo( camera_info_url_right );
+//
+//		ROS_INFO("custom DUO calibration files loaded");
+//	}
+//	else
+//	{
+//		ROS_ERROR("Calibration URL is invalid.");
+//		ROS_WARN("Will continue to publish uncalibrated images!");
+//	}
 
 	_priv_nh.param<bool>("HorizontalFlip", _horizontal_flip, false);
 	_priv_nh.param<bool>("VerticalFlip", _vertical_flip, false);

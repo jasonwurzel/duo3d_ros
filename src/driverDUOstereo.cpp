@@ -37,7 +37,7 @@ DUOStereoDriver::DUOStereoDriver(void):
 	}
 
 	_pub = _camera_nh.advertise<sensor_msgs::Imu>("cam_imu", 5);
-	_combined_pub =_camera_nh.advertise<duo3d_ros::Duo3d>("combined", 100);
+	_combined_pub =_camera_nh.advertise<vio_ros::VioSensorMsg>("/vio_sensor", 100);
 	_mag_pub = _camera_nh.advertise<sensor_msgs::MagneticField>("cam_mag",1);
 	_temp_pub = _camera_nh.advertise<sensor_msgs::Temperature>("cam_temp",1);
 
@@ -165,7 +165,7 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 
 	img_msg.header.stamp = ros::Time( double(pFrameData->timeStamp) * 1.e-4);
 
-	duo3d_ros::Duo3d combined_msg;
+	vio_ros::VioSensorMsg combined_msg;
 	combined_msg.header = img_msg.header;
 	combined_msg.imu = img_msg;
 	combined_msg.left_image = *image[0];
@@ -198,7 +198,7 @@ void DUOStereoDriver::publishMagData(const sensor_msgs::MagneticField &mag_msg)
 	_mag_pub.publish(mag_msg);
 }
 
-void DUOStereoDriver::publishCombinedData(const duo3d_ros::Duo3d &combined_msg)
+void DUOStereoDriver::publishCombinedData(const vio_ros::VioSensorMsg &combined_msg)
 {
 	_combined_pub.publish(combined_msg);
 //	ROS_INFO("Sending message %d", combined_msg.id.data);

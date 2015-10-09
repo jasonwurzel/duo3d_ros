@@ -18,7 +18,8 @@
 #include <sensor_msgs/Temperature.h>
 #include <image_transport/image_transport.h>
 #include <camera_info_manager/camera_info_manager.h>
-#include "duo3d_ros/Duo3d.h"
+
+#include "vio_ros/VioSensorMsg.h"
 
 #include <dynamic_reconfigure/server.h>
 #include <duo3d_ros/DuoConfig.h>
@@ -221,7 +222,7 @@ private:
 
 	void publishImuData(const sensor_msgs::Imu &img_msg);
 
-	void publishCombinedData(const duo3d_ros::Duo3d &combined_msg);
+	void publishCombinedData(const vio_ros::VioSensorMsg &combined_msg);
 
 	void publishMagData(const sensor_msgs::MagneticField &mag_msg);
 

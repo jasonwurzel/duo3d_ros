@@ -65,16 +65,16 @@ generate_dynamic_reconfigure_options(
   cfg/Duo.cfg
 )
 
-add_message_files(
-  FILES
-  Duo3d.msg
-)
+#add_message_files(
+#  FILES
+#  Duo3d.msg
+#)
 
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-  sensor_msgs
-)
+#generate_messages(
+#  DEPENDENCIES
+#  std_msgs
+#  sensor_msgs
+#)
 
 catkin_package( CATKIN_DEPENDS geometry_msgs roscpp tf message_runtime)
 

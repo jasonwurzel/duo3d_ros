@@ -154,20 +154,20 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 
 	/*--------------------------------------------------------*/
 	// Imu stuff
-	sensor_msgs::Imu img_msg;
-	img_msg.angular_velocity.x = pFrameData->gyroData[0];
-	img_msg.angular_velocity.y = pFrameData->gyroData[1];
-	img_msg.angular_velocity.z = pFrameData->gyroData[2];
+	sensor_msgs::Imu imu_msg;
+	imu_msg.angular_velocity.x = pFrameData->gyroData[0];
+	imu_msg.angular_velocity.y = pFrameData->gyroData[1];
+	imu_msg.angular_velocity.z = pFrameData->gyroData[2];
 
-	img_msg.linear_acceleration.x = pFrameData->accelData[0];
-	img_msg.linear_acceleration.y = pFrameData->accelData[1];
-	img_msg.linear_acceleration.z = pFrameData->accelData[2];
+	imu_msg.linear_acceleration.x = pFrameData->accelData[0];
+	imu_msg.linear_acceleration.y = pFrameData->accelData[1];
+	imu_msg.linear_acceleration.z = pFrameData->accelData[2];
 
-	img_msg.header.stamp = ros::Time( double(pFrameData->timeStamp) * 1.e-4);
+	imu_msg.header.stamp = ros::Time( double(pFrameData->timeStamp) * 1.e-4);
 
 	vio_ros::VioSensorMsg combined_msg;
-	combined_msg.header = img_msg.header;
-	combined_msg.imu = img_msg;
+	combined_msg.header = imu_msg.header;
+	combined_msg.imu = imu_msg;
 	combined_msg.left_image = *image[0];
 	combined_msg.right_image = *image[1];
 	duoDriver.publishCombinedData(combined_msg);
@@ -187,7 +187,7 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 	if (duoDriver._publish_raw)
 	{
 		duoDriver.publishImages(image);
-		duoDriver.publishImuData(img_msg);
+		duoDriver.publishImuData(imu_msg);
 		duoDriver.publishMagData(mag_msg);
 		duoDriver.publishTempData(temp_msg);
 	}

@@ -155,13 +155,13 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 	/*--------------------------------------------------------*/
 	// Imu stuff
 	sensor_msgs::Imu imu_msg;
-	imu_msg.angular_velocity.x = pFrameData->gyroData[0];
-	imu_msg.angular_velocity.y = pFrameData->gyroData[1];
-	imu_msg.angular_velocity.z = pFrameData->gyroData[2];
+	imu_msg.angular_velocity.x = +pFrameData->gyroData[0];
+	imu_msg.angular_velocity.y = -pFrameData->gyroData[1];
+	imu_msg.angular_velocity.z = +pFrameData->gyroData[2];
 
-	imu_msg.linear_acceleration.x = pFrameData->accelData[0];
-	imu_msg.linear_acceleration.y = pFrameData->accelData[1];
-	imu_msg.linear_acceleration.z = pFrameData->accelData[2];
+	imu_msg.linear_acceleration.x = +pFrameData->accelData[0]*9.81;
+	imu_msg.linear_acceleration.y = -pFrameData->accelData[1]*9.81;
+	imu_msg.linear_acceleration.z = -pFrameData->accelData[2]*9.81;
 
 	imu_msg.header.stamp = ros::Time( double(pFrameData->timeStamp) * 1.e-4);
 

@@ -170,8 +170,8 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 	combined_msg.imu = imu_msg;
 	combined_msg.left_image = *image[0];
 	combined_msg.right_image = *image[1];
+	combined_msg.seq.data = duoDriver.msg_cnt++;
 	duoDriver.publishCombinedData(combined_msg);
-	duoDriver.msg_cnt++;
 
 	sensor_msgs::MagneticField mag_msg;
 	mag_msg.magnetic_field.x = pFrameData->magData[0];
@@ -419,9 +419,9 @@ void DUOStereoDriver::dynamicCallback(duo3d_ros::DuoConfig &config, uint32_t lev
 
 }
 
-void DUOStereoDriver::msgProcessedCb(const std_msgs::UInt32 &msg)
+void DUOStereoDriver::msgProcessedCb(const std_msgs::UInt64 &msg)
 {
-	unsigned int diff = msg_cnt - msg.data;
+	int diff = msg_cnt - 1 - msg.data;
 	if (diff > 10)
 		ROS_WARN("DUO3d queue very long! Subscriber is %d messages behind", diff);
 }

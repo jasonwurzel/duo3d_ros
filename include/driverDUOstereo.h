@@ -247,7 +247,7 @@ private:
 
 	static DUOStereoDriver* pSingleton;
 
-	void msgProcessedCb(const std_msgs::UInt32 &msg);
+	void msgProcessedCb(const std_msgs::UInt64 &msg);
 };
 
 }

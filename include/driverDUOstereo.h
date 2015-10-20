@@ -178,6 +178,7 @@ private:
 	ros::Publisher _mag_pub;
 	ros::Publisher _temp_pub;
 	ros::Subscriber _msg_processed_sub;
+    ros::Publisher queue_size_pub;
 
 	/*
 	 * 	@brief

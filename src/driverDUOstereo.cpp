@@ -43,7 +43,7 @@ DUOStereoDriver::DUOStereoDriver(void):
 
 	_msg_processed_sub = _camera_nh.subscribe("/duo3d/msg_processed",100,
 			&DUOStereoDriver::msgProcessedCb, this);
-	_device_serial_nr_pub = _camera_nh.advertise<std_msgs::String>("device_serial_nr", 1, true);
+	_device_serial_nr_pub = _camera_nh.advertise<std_msgs::String>("/vio_sensor/device_serial_nr", 1, true);
 	_queue_size_pub = _camera_nh.advertise<std_msgs::UInt64>("queue_size", 100);
 }
 

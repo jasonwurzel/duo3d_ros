@@ -12,6 +12,7 @@
 #include <DUOLib.h>
 #include <ros/ros.h>
 #include <std_msgs/UInt32.h>
+#include <std_msgs/String.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/MagneticField.h>
@@ -178,6 +179,7 @@ private:
 	ros::Publisher _mag_pub;
 	ros::Publisher _temp_pub;
 	ros::Subscriber _msg_processed_sub;
+	ros::Publisher _device_serial_nr_pub;
 
 	/*
 	 * 	@brief

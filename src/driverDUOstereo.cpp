@@ -43,6 +43,7 @@ DUOStereoDriver::DUOStereoDriver(void):
 
 	_msg_processed_sub = _camera_nh.subscribe("/duo3d/msg_processed",100,
 			&DUOStereoDriver::msgProcessedCb, this);
+	_device_serial_nr_pub = _camera_nh.advertise<std_msgs::String>("device_serial_nr", 1, true);
 }
 
 
@@ -356,6 +357,13 @@ bool DUOStereoDriver::initializeDUO()
 //#if LINUX_VERSION_CODE == 199940 //corresponds to 3.10.82-duo3d+
 //			SetDUOIMURange(_duoInstance, DUO_ACCEL_16G, DUO_GYRO_1000);
 //#endif
+			std::string serialNumberStr;
+			serialNumberStr.append(_duoDeviceSerialNumber, 36);
+
+			std_msgs::String serialNrMsg;
+			serialNrMsg.data = serialNumberStr;
+			_device_serial_nr_pub.publish(serialNrMsg);
+			ROS_INFO("DUO serial number: %s", serialNrMsg.data.c_str());
 
 		}
 		else

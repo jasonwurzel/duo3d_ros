@@ -44,6 +44,7 @@ DUOStereoDriver::DUOStereoDriver(void):
 	_msg_processed_sub = _camera_nh.subscribe("/duo3d/msg_processed",100,
 			&DUOStereoDriver::msgProcessedCb, this);
 	_device_serial_nr_pub = _camera_nh.advertise<std_msgs::String>("device_serial_nr", 1, true);
+	_queue_size_pub = _camera_nh.advertise<std_msgs::UInt64>("queue_size", 100);
 }
 
 
@@ -430,6 +431,9 @@ void DUOStereoDriver::dynamicCallback(duo3d_ros::DuoConfig &config, uint32_t lev
 void DUOStereoDriver::msgProcessedCb(const std_msgs::UInt64 &msg)
 {
 	int diff = msg_cnt - 1 - msg.data;
+    std_msgs::UInt64 queue_size_msg;
+    queue_size_msg.data = diff;
+    _queue_size_pub.publish(queue_size_msg);
 	if (diff > 10)
 		ROS_WARN("DUO3d queue very long! Subscriber is %d messages behind", diff);
 }

@@ -180,6 +180,7 @@ private:
 	ros::Publisher _temp_pub;
 	ros::Subscriber _msg_processed_sub;
 	ros::Publisher _device_serial_nr_pub;
+    ros::Publisher _queue_size_pub;
 
 	/*
 	 * 	@brief

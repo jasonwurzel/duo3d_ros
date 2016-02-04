@@ -1,0 +1,47 @@
+CameraParameters1:
+  DistortionModel: plumb_bob
+  RadialDistortion: [0, 0, 0]
+  TangentialDistortion: [0.0, 0.0]
+  FocalLength: [0, 0]
+  PrincipalPoint: [0, 0]
+CameraParameters2:
+  DistortionModel: plumb_bob
+  RadialDistortion: [0, 0, 0]
+  TangentialDistortion: [0.0, 0.0]
+  FocalLength: [0, 0]
+  PrincipalPoint: [0, 0]
+r_lr:
+- [0]
+- [0]
+- [0]
+R_lr:
+- [0, 0, 0]
+- [0, 0, 0]
+- [0, 0, 0]
+R_rl:
+- [0, 0, 0]
+- [0, 0, 0]
+- [0, 0, 0]
+R_ci:
+- [0, 0, 0]
+- [0, 0, 0]
+- [0, 0, 0]
+t_ci:
+- [0]
+- [0]
+- [0]
+gyro_bias:
+- [0]
+- [0]
+- [0]
+acc_bias:
+- [0]
+- [0]
+- [0]
+time_shift: 0
+#Kalibr_params:
+#  update_rate: 100.0 #Hz
+#  accelerometer_noise_density: 0.1 #continous
+#  accelerometer_random_walk: 0.000002
+#  gyroscope_noise_density: 0.01 #continous
+#  gyroscope_random_walk: 0.000002

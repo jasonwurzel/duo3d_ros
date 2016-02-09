@@ -435,7 +435,7 @@ void DUOStereoDriver::msgProcessedCb(const std_msgs::UInt64 &msg)
     queue_size_msg.data = diff;
     _queue_size_pub.publish(queue_size_msg);
 	if (diff > 10)
-		ROS_WARN("DUO3d queue very long! Subscriber is %d messages behind", diff);
+		ROS_WARN_THROTTLE(1, "DUO3d queue very long! Subscriber is %d messages behind", diff);
 }
 void DUOStereoDriver::setup(void)
 {

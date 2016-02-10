@@ -1,13 +1,11 @@
 #!/usr/bin/python
 from __future__ import print_function, division
-import rospy
 import yaml
 import sys
 import rospkg
 import os
 
 __author__ = 'nicolas'
-
 
 if __name__ == "__main__":
     # select device
@@ -77,13 +75,11 @@ if __name__ == "__main__":
         resolution = resolutions[selection-1]
 
     # load the yaml files
-    f = open(os.path.join(duo_path, 'calib', device_serial_nr, 'last_bias_estimate.yaml'), 'r')
-    last_bias_estimate = yaml.load(f)
-    f.close()
+    with open(os.path.join(duo_path, 'calib', device_serial_nr, 'last_bias_estimate.yaml'), 'r') as infile:
+        last_bias_estimate = yaml.load(infile)
 
-    f = open(os.path.join(duo_path, 'calib', device_serial_nr, lens, resolution, 'cameraParams.yaml'), 'r')
-    cameraParams = yaml.load(f)
-    f.close()
+    with open(os.path.join(duo_path, 'calib', device_serial_nr, lens, resolution, 'cameraParams.yaml'), 'r') as infile:
+        cameraParams = yaml.load(infile)
 
     print('For each axis of the accelerometer and gyroscope you can decide to use the new estimate (answer y), keep the old one (answer n) or manually provide your own (answer o).')
 

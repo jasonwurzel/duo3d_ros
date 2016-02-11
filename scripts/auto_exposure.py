@@ -60,7 +60,7 @@ if __name__ == "__main__":
     camera_fps = rospy.get_param('/duo_node/FPS', 1)
     if not recompute_frequency:
         recompute_frequency = camera_fps
-    recompute_delay = max(int(camera_fps / recompute_frequency), 1)e
+    recompute_delay = max(int(camera_fps / recompute_frequency), 1)
     if not transition_frequency:
         transition_frequency = camera_fps
     transition_delay = max(int(camera_fps / transition_frequency), 1)

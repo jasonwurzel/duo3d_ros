@@ -30,19 +30,16 @@ DUOStereoDriver::DUOStereoDriver(void):
 	for(int i = 0; i < TWO_CAMERAS; i++)
 	{
 		_single_camera_nh[i] 	= ros::NodeHandle(_camera_nh, CameraNames[i]);  // for i-th CameraInfoManager
-		_cinfo[i] 				= boost::shared_ptr<camera_info_manager::CameraInfoManager>
-		(new camera_info_manager::CameraInfoManager(_single_camera_nh[i]));
+		_cinfo[i] 				= boost::shared_ptr<camera_info_manager::CameraInfoManager>(new camera_info_manager::CameraInfoManager(_single_camera_nh[i]));
 		_calibrationMatches[i] 	= true;
 		_imagePub[i] 			= _it->advertiseCamera(CameraNames[i]+"/image_raw", 1);
 	}
 
 	_pub = _camera_nh.advertise<sensor_msgs::Imu>("cam_imu", 5);
 	_combined_pub =_camera_nh.advertise<vio_ros::VioSensorMsg>("/vio_sensor", 100);
-	_mag_pub = _camera_nh.advertise<sensor_msgs::MagneticField>("cam_mag",1);
 	_temp_pub = _camera_nh.advertise<sensor_msgs::Temperature>("cam_temp",1);
 
-	_msg_processed_sub = _camera_nh.subscribe("/duo3d/msg_processed",100,
-			&DUOStereoDriver::msgProcessedCb, this);
+	_msg_processed_sub = _camera_nh.subscribe("/duo3d/msg_processed", 100, &DUOStereoDriver::msgProcessedCb, this);
 	_device_serial_nr_pub = _camera_nh.advertise<std_msgs::String>("/vio_sensor/device_serial_nr", 1, true);
 	_queue_size_pub = _camera_nh.advertise<std_msgs::UInt64>("queue_size", 100);
 }
@@ -157,47 +154,40 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 	/*--------------------------------------------------------*/
 	// Imu stuff
 	sensor_msgs::Imu imu_msg;
-	imu_msg.angular_velocity.x = +pFrameData->gyroData[0];
-	imu_msg.angular_velocity.y = -pFrameData->gyroData[1];
-	imu_msg.angular_velocity.z = +pFrameData->gyroData[2];
 
-	imu_msg.linear_acceleration.x = +pFrameData->accelData[0]*9.81;
-	imu_msg.linear_acceleration.y = -pFrameData->accelData[1]*9.81;
-	imu_msg.linear_acceleration.z = -pFrameData->accelData[2]*9.81;
+	vio_ros::VioSensorMsg combined_msg;
+
+	for (int i = 0; i < pFrameData->IMUSamples; i++)
+	{
+		imu_msg.angular_velocity.x = +pFrameData->IMUData[i].gyroData[0];
+		imu_msg.angular_velocity.y = -pFrameData->IMUData[i].gyroData[1];
+		imu_msg.angular_velocity.z = +pFrameData->IMUData[i].gyroData[2];
+
+		imu_msg.linear_acceleration.x = +pFrameData->IMUData[i].accelData[0]*9.81;
+		imu_msg.linear_acceleration.y = -pFrameData->IMUData[i].accelData[1]*9.81;
+		imu_msg.linear_acceleration.z = -pFrameData->IMUData[i].accelData[2]*9.81;
+
+		combined_msg.imu.push_back(imu_msg);
+	}
 
 	imu_msg.header.stamp = ros::Time( double(pFrameData->timeStamp) * 1.e-4);
 
-	vio_ros::VioSensorMsg combined_msg;
 	combined_msg.header = imu_msg.header;
-	combined_msg.imu = imu_msg;
 	combined_msg.left_image = *image[0];
 	combined_msg.right_image = *image[1];
 	combined_msg.seq.data = duoDriver.msg_cnt++;
 	duoDriver.publishCombinedData(combined_msg);
 
-	sensor_msgs::MagneticField mag_msg;
-	mag_msg.magnetic_field.x = pFrameData->magData[0];
-	mag_msg.magnetic_field.y = pFrameData->magData[1];
-	mag_msg.magnetic_field.z = pFrameData->magData[2];
-
-	mag_msg.header.stamp = ros::Time(double(pFrameData->timeStamp) * 1.e-4);
-
 	sensor_msgs::Temperature temp_msg;
-	temp_msg.temperature = pFrameData->tempData;
+	temp_msg.temperature = pFrameData->IMUData[0].tempData;
 	temp_msg.header.stamp = ros::Time(double(pFrameData->timeStamp) * 1.e-4);
 
 	if (duoDriver._publish_raw)
 	{
 		duoDriver.publishImages(image);
 		duoDriver.publishImuData(imu_msg);
-		duoDriver.publishMagData(mag_msg);
 		duoDriver.publishTempData(temp_msg);
 	}
-}
-
-void DUOStereoDriver::publishMagData(const sensor_msgs::MagneticField &mag_msg)
-{
-	_mag_pub.publish(mag_msg);
 }
 
 void DUOStereoDriver::publishCombinedData(const vio_ros::VioSensorMsg &combined_msg)
@@ -219,7 +209,7 @@ void DUOStereoDriver::publishTempData(const sensor_msgs::Temperature &temp_msg)
 bool DUOStereoDriver::initializeDUO()
 {
 	// Implement libCheck() later to tell user they need to update their DUO SDK
-	ROS_DEBUG("DUOLib Version: %s", GetLibVersion());
+	ROS_INFO("DUOLib Version: %s", GetLibVersion());
 
 
 	std::string 	deviceName;
@@ -356,7 +346,7 @@ bool DUOStereoDriver::initializeDUO()
 			SetDUOLedPWM(_duoInstance, _duoLEDLevel);
 			SetDUOCameraSwap(_duoInstance, _duoCameraSwap); // Switches left and right images
 //#if LINUX_VERSION_CODE == 199940 //corresponds to 3.10.82-duo3d+
-//			SetDUOIMURange(_duoInstance, DUO_ACCEL_16G, DUO_GYRO_1000);
+			SetDUOIMURange(_duoInstance, DUO_ACCEL_16G, DUO_GYRO_1000);
 //#endif
 			std::string serialNumberStr;
 			serialNumberStr.append(_duoDeviceSerialNumber, 36);

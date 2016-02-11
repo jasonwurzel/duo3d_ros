@@ -176,7 +176,6 @@ private:
 
 	ros::Publisher _pub;
 	ros::Publisher _combined_pub;
-	ros::Publisher _mag_pub;
 	ros::Publisher _temp_pub;
 	ros::Subscriber _msg_processed_sub;
 	ros::Publisher _device_serial_nr_pub;
@@ -226,8 +225,6 @@ private:
 	void publishImuData(const sensor_msgs::Imu &img_msg);
 
 	void publishCombinedData(const vio_ros::VioSensorMsg &combined_msg);
-
-	void publishMagData(const sensor_msgs::MagneticField &mag_msg);
 
 	void publishTempData(const sensor_msgs::Temperature &temp_msg);
 

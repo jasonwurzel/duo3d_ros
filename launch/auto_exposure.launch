@@ -1,0 +1,16 @@
+<launch>
+
+    <arg name="target_brightness" default="125" />
+    <arg name="controller_gain" default="0.5" />
+    <arg name="recompute_frequency" default="5" />
+
+
+    <node pkg="duo3d_ros" name="duo_auto_exposure" type="auto_exposure.py" output="screen">
+        <param name="target_brightness"     value="$(arg target_brightness)" />
+        <param name="controller_gain"       value="$(arg controller_gain)" />
+        <param name="recompute_frequency"   value="$(arg recompute_frequency)" />
+
+    </node>
+
+
+</launch>

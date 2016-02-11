@@ -2,7 +2,7 @@
 
     <arg name="exposure" default="100" />
     <arg name="gain" default="100" />
-    <arg name="FPS" default="100" />
+    <arg name="FPS" default="50" />
     <arg name="resolution_width" default="320" />
     <arg name="resolution_height" default="240" />
     <arg name="publish_raw" default="1" />
@@ -40,8 +40,8 @@
 	    <param name="use_DUO_imu"   	value="true" />
 	    <param name="use_DUO_LEDs"   	value="true" />
 
-	    <param name="VerticalFlip"   	value="true" />
-	    <param name="HorizontalFlip"   	value="true" />
+	    <param name="VerticalFlip"   	value="false" />
+	    <param name="HorizontalFlip"   	value="false" />
 	    <param name="CameraSwap"     	value="true" />
 	    
 	    <param name="publish_raw" type="bool" value="$(arg publish_raw)" />
@@ -52,5 +52,7 @@
 	    <param name="camera_info_right" value="file://$(find duo3d_ros)/calibration/duo3d_right.yaml" />
     </node>
 
+  <include file="$(find duo3d_ros)/launch/auto_exposure.launch">
+  </include>
 
 </launch>

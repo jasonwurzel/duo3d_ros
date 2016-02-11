@@ -97,7 +97,7 @@ if(WIN32)
         target_link_libraries(duo_node DUOlib)
 #        target_link_libraries(dense3d DUOlib)
 elseif(UNIX OR APPLE)
-	target_link_libraries(duo_node duo)
+	target_link_libraries(duo_node DUO)
 #        target_link_libraries(dense3d duo)
 endif()
 

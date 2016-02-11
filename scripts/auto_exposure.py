@@ -60,10 +60,10 @@ if __name__ == "__main__":
     camera_fps = rospy.get_param('/duo_node/FPS', 1)
     if not recompute_frequency:
         recompute_frequency = camera_fps
-    recompute_delay = int(camera_fps / recompute_frequency)
+    recompute_delay = max(int(camera_fps / recompute_frequency), 1)e
     if not transition_frequency:
         transition_frequency = camera_fps
-    transition_delay = int(camera_fps / transition_frequency)
+    transition_delay = max(int(camera_fps / transition_frequency), 1)
     recompute_cnt = 0
     transition_cnt = 0
     filtered_mean = target_brightness

@@ -19,7 +19,6 @@ def vio_sensor_cb(data):
         filtered_mean,\
         exposure_change
 
-    recompute_cnt += 1
     if not recompute_cnt % recompute_delay:
         mean_l = cv2.mean(cv_bridge.CvBridge().imgmsg_to_cv2(data.left_image, desired_encoding="passthrough"))
         mean_r = cv2.mean(cv_bridge.CvBridge().imgmsg_to_cv2(data.right_image, desired_encoding="passthrough"))
@@ -29,6 +28,12 @@ def vio_sensor_cb(data):
 
         exposure_change = -controller_gain * (filtered_mean - target_brightness)
 
+    recompute_cnt += 1
+    transition_cnt += 1
+
+    if not transition_cnt % transition_delay and recompute_cnt % recompute_delay:
+        return
+
     exposure_change_actual = max(-max_step_size, min(max_step_size, exposure_change))
 
     new_exposure = dynamic_reconfigure_config['exposure'] + exposure_change_actual
@@ -36,9 +41,9 @@ def vio_sensor_cb(data):
     exposure_change -= exposure_change_actual
 
     # print('exposure_change {} exposure_change_actual {}'.format(exposure_change, exposure_change_actual))
-    if not transition_cnt % transition_delay:
-        params = {'exposure': new_exposure}
-        dynamic_reconfigure_config = dynamic_reconfigure_client.update_configuration(params)
+
+    params = {'exposure': new_exposure}
+    dynamic_reconfigure_config = dynamic_reconfigure_client.update_configuration(params)
 
 
 if __name__ == "__main__":

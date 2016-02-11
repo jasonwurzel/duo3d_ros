@@ -1,5 +1,5 @@
 <launch>
-
+    <arg name="auto_exposure" default="true" />
     <arg name="exposure" default="50" />
     <arg name="gain" default="100" />
     <arg name="FPS" default="50" />
@@ -52,7 +52,7 @@
 	    <param name="camera_info_right" value="file://$(find duo3d_ros)/calibration/duo3d_right.yaml" />
     </node>
 
-  <include file="$(find duo3d_ros)/launch/auto_exposure.launch">
+  <include file="$(find duo3d_ros)/launch/auto_exposure.launch" if="$(arg auto_exposure)">
   </include>
 
 </launch>

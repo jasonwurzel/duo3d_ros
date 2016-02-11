@@ -7,7 +7,17 @@ import dynamic_reconfigure.client
 
 
 def vio_sensor_cb(data):
-    global target_brightness, dynamic_reconfigure_client, dynamic_reconfigure_config, recompute_delay, recompute_cnt, controller_gain, average_lowpass, filtered_mean, exposure_change
+    global target_brightness,\
+        dynamic_reconfigure_client,\
+        dynamic_reconfigure_config,\
+        recompute_delay,\
+        recompute_cnt,\
+        transition_delay,\
+        transition_cnt,\
+        controller_gain,\
+        average_lowpass,\
+        filtered_mean,\
+        exposure_change
 
     recompute_cnt += 1
     if not recompute_cnt % recompute_delay:
@@ -26,9 +36,9 @@ def vio_sensor_cb(data):
     exposure_change -= exposure_change_actual
 
     # print('exposure_change {} exposure_change_actual {}'.format(exposure_change, exposure_change_actual))
-
-    params = {'exposure': new_exposure}
-    dynamic_reconfigure_config = dynamic_reconfigure_client.update_configuration(params)
+    if not transition_cnt % transition_delay:
+        params = {'exposure': new_exposure}
+        dynamic_reconfigure_config = dynamic_reconfigure_client.update_configuration(params)
 
 
 if __name__ == "__main__":
@@ -37,13 +47,20 @@ if __name__ == "__main__":
 
     target_brightness = rospy.get_param('~target_brightness', 256 / 2)  # desired average brightness
     recompute_frequency = rospy.get_param('~recompute_frequency', 1)  # how many times per second to recompute the mean
+    transition_frequency = rospy.get_param('~transition_frequency', 1)  # how many times per second to change exposure
     controller_gain = rospy.get_param('~controller_gain', 1)  # gain that translates mean brightness error to change in exposure
     average_lowpass = rospy.get_param('~average_lowpass', 0.5)  # gain of lowpass filter that filters the mean brightness measurement
     average_lowpass = max(0, min(1, average_lowpass))
     max_step_size = rospy.get_param('~max_step_size', 1)  # maximum exposure change per frame
     camera_fps = rospy.get_param('/duo_node/FPS', 1)
-    recompute_delay = camera_fps / recompute_frequency
+    if not recompute_frequency:
+        recompute_frequency = camera_fps
+    recompute_delay = int(camera_fps / recompute_frequency)
+    if not transition_frequency:
+        transition_frequency = camera_fps
+    transition_delay = int(camera_fps / transition_frequency)
     recompute_cnt = 0
+    transition_cnt = 0
     filtered_mean = target_brightness
     exposure_change = 0
 

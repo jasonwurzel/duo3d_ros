@@ -1,6 +1,6 @@
 <launch>
 
-    <arg name="exposure" default="100" />
+    <arg name="exposure" default="50" />
     <arg name="gain" default="100" />
     <arg name="FPS" default="50" />
     <arg name="resolution_width" default="320" />

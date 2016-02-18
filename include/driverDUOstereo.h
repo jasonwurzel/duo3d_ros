@@ -157,7 +157,6 @@ private:
 	int _recompute_delay;
 	int _transition_delay;
 	double _max_step_size;
-	double _filtered_mean;
 
 	/*
 	 *	@params for whether or not to use IMU and/or LED sequences

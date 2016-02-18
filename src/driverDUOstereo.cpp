@@ -460,7 +460,6 @@ void DUOStereoDriver::shutdownDUO()
 
 void DUOStereoDriver::autoExposure(const PDUOFrame pFrameData)
 {
-	double average_lowpass = 0.5;
 	if (!_do_auto_exposure)
 		return;
 
@@ -476,12 +475,7 @@ void DUOStereoDriver::autoExposure(const PDUOFrame pFrameData)
 
 		current_mean /= 2*pFrameData->width*pFrameData->height;
 
-		if (_recompute_cnt == 1)
-			_filtered_mean = current_mean;
-		else
-			_filtered_mean = (1-average_lowpass) * _filtered_mean + average_lowpass * current_mean;
-
-		_exposure_change = -_controller_gain * (_filtered_mean - _target_brightness);
+		_exposure_change = -_controller_gain * (current_mean - _target_brightness);
 	}
 
 	if (!(_transition_cnt % _transition_delay) || !(_recompute_cnt % _recompute_delay))

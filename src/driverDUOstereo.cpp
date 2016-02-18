@@ -91,32 +91,31 @@ void DUOStereoDriver::publishImages(const sensor_msgs::ImagePtr image[TWO_CAMERA
 	for (int i = 0; i < TWO_CAMERAS; i++)
 	{
 		// Get current CameraInfo data and populate ImagePtr Array
-		sensor_msgs::CameraInfoPtr
-		ci(new sensor_msgs::CameraInfo(_cinfo[i]->getCameraInfo()));
+		sensor_msgs::CameraInfoPtr ci(new sensor_msgs::CameraInfo(_cinfo[i]->getCameraInfo()));
 
 		// If camera info and image width and height dont match
 		// then set calibration_matches to false so we then
 		// know if we should reset the camera info or not
-		if (!validateCameraInfo(*image[i], *ci))
-		{
-			if(_calibrationMatches[i])
-			{
-				_calibrationMatches[i] = false;
-				ROS_WARN_STREAM("*" << _camera_name << "/" << CameraNames[i] << "* "
-						<< "camera_info is different then calibration info. "
-						<< "Uncalibrated image being sent.");
-			}
-			ci.reset(new sensor_msgs::CameraInfo());
-			ci->height 	= image[i]->height;
-			ci->width 	= image[i]->width;
-		}
-		else if (!_calibrationMatches[i])
-		{
-			// Calibration is now okay
-			_calibrationMatches[i] = true;
-			ROS_WARN_STREAM("*" << _camera_name << "/" << CameraNames[i] << "* "
-					<< "is now publishing calibrated images. ");
-		}
+//		if (!validateCameraInfo(*image[i], *ci))
+//		{
+//			if(_calibrationMatches[i])
+//			{
+//				_calibrationMatches[i] = false;
+//				ROS_WARN_STREAM("*" << _camera_name << "/" << CameraNames[i] << "* "
+//						<< "camera_info is different then calibration info. "
+//						<< "Uncalibrated image being sent.");
+//			}
+//			ci.reset(new sensor_msgs::CameraInfo());
+//			ci->height 	= image[i]->height;
+//			ci->width 	= image[i]->width;
+//		}
+//		else if (!_calibrationMatches[i])
+//		{
+//			// Calibration is now okay
+//			_calibrationMatches[i] = true;
+//			ROS_WARN_STREAM("*" << _camera_name << "/" << CameraNames[i] << "* "
+//					<< "is now publishing calibrated images. ");
+//		}
 
 		ci->header.frame_id = image[i]->header.frame_id;
 		ci->header.stamp 	= image[i]->header.stamp;
@@ -150,7 +149,6 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 	// Then publish the images
 	//duoDriver.fillDUOImages(*image[duoDriver.LEFT_CAM], *image[duoDriver.RIGHT_CAM], pFrameData);
 	duoDriver.fillDUOImages(*image[1], *image[0], pFrameData); //we had to swich the image
-
 
 	/*--------------------------------------------------------*/
 	// Imu stuff
@@ -356,15 +354,15 @@ bool DUOStereoDriver::initializeDUO()
 			ROS_INFO("DUO serial number: %s", serialNrMsg.data.c_str());
 
 			// auto exposure parameters
-			_priv_nh.param("auto_exposure"		, _do_auto_exposure	, false);
-			_priv_nh.param("auto_exposure_target_brightness"		, _target_brightness	, 125.0);
-			_priv_nh.param("auto_exposure_controller_gain"		, _controller_gain	, 1.0);
+			_priv_nh.param("auto_exposure",						_do_auto_exposure,	false);
+			_priv_nh.param("auto_exposure_target_brightness",	_target_brightness,	125.0);
+			_priv_nh.param("auto_exposure_controller_gain",		_controller_gain,	1.0);
 			double tmp;
-			_priv_nh.param("auto_exposure_recompute_frequency"	, tmp, 1.0);
+			_priv_nh.param("auto_exposure_recompute_frequency",		tmp,	1.0);
 			_recompute_delay = (tmp && tmp <= framesPerSecond) ? framesPerSecond/tmp : 1;
-			_priv_nh.param("auto_exposure_transition_frequency"	, tmp	, 1.0);
+			_priv_nh.param("auto_exposure_transition_frequency",	tmp,	1.0);
 			_transition_delay = (tmp && tmp <= framesPerSecond) ? framesPerSecond/tmp : 1;
-			_priv_nh.param("auto_exposure_max_step_size"			, _max_step_size	, 100.0);
+			_priv_nh.param("auto_exposure_max_step_size",			_max_step_size,	100.0);
 		}
 		else
 		{
@@ -473,9 +471,8 @@ void DUOStereoDriver::autoExposure(const PDUOFrame pFrameData)
 		double current_mean = 0;
 
 		for (int i = 0; i < pFrameData->width*pFrameData->height; i++)
-		{
 			current_mean += pFrameData->leftData[i] + pFrameData->rightData[i];
-		}
+
 		current_mean /= 2*pFrameData->width*pFrameData->height;
 
 		_exposure_change = -_controller_gain * (current_mean - _target_brightness);
@@ -483,15 +480,12 @@ void DUOStereoDriver::autoExposure(const PDUOFrame pFrameData)
 
 	if (!(_transition_cnt % _transition_delay) || !(_recompute_cnt % _recompute_delay))
 	{
-//		printf("exposure_change %.03f ", _exposure_change);
 		double exposure_change_actual = std::max(-_max_step_size, std::min(_max_step_size, _exposure_change));
 		_exposure_change -= exposure_change_actual;
 
 		double current_exposure;
 		GetDUOExposure(_duoInstance, &current_exposure);
 		SetDUOExposure(_duoInstance, current_exposure + exposure_change_actual);
-		GetDUOExposure(_duoInstance, &current_exposure); // for debug output
-//		printf("exposure_change_actual %.03f exposure %.03f\n", exposure_change_actual, current_exposure);
 	}
 
 }

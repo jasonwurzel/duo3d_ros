@@ -22,29 +22,29 @@ using namespace duoStereo_driver;
  */
 void sigIntHandler(int sig)
 {
-    ROS_DEBUG("--> SIGINT Handler called <--");
+	ROS_DEBUG("--> SIGINT Handler called <--");
 
-    //Destory our pSingleton Instance that we created.
-    DUOStereoDriver::DestroyInstance();
+	//Destory our pSingleton Instance that we created.
+	DUOStereoDriver::DestroyInstance();
 
-    // Tell the ros node that we want to shutdown, so we receive a 
-    // clean exit
-    ros::shutdown();
+	// Tell the ros node that we want to shutdown, so we receive a
+	// clean exit
+	ros::shutdown();
 }
 
 
 int main(int argc, char **argv)
 {
-  	ros::init(argc, argv, "duo3d_node");
+	ros::init(argc, argv, "duo3d_node");
 
-  	/*
-  	 *	@brief
-  	 *	Singleton implementation; Calling the GetInstance() function, which will
-  	 *	return us the pointer to the pSingleton member, so that we always only use
-  	 * 	one instance of the DUOStereoDriver class, and then can normally call public
-  	 *	member functions later.
-  	 */
-  	DUOStereoDriver& duoDriver = DUOStereoDriver::GetInstance();
+	/*
+	 *	@brief
+	 *	Singleton implementation; Calling the GetInstance() function, which will
+	 *	return us the pointer to the pSingleton member, so that we always only use
+	 * 	one instance of the DUOStereoDriver class, and then can normally call public
+	 *	member functions later.
+	 */
+	DUOStereoDriver& duoDriver = DUOStereoDriver::GetInstance();
 
 
 	/*
@@ -53,23 +53,23 @@ int main(int argc, char **argv)
 	 *	being initialized in the contructor, which is fine). This listen to, for example,
 	 * 	a 'ctrl+c' shutdown signal, and then the sigIntHandler callback is invoked.
 	 */
-  	signal(SIGINT, sigIntHandler);
+	signal(SIGINT, sigIntHandler);
 
-  	/*
-  	 *	@brief
-  	 *	First see if we can successfully initialize the DUO, then start the DUO
-  	 * 	to capture frames from camera. Once the camera is started, ros::spin()
-  	 *	is called so that the NodeHandle publishers have a chance to be invoked
-  	 * 	and send the images to their topics.
-  	 */
-  	if (duoDriver.initializeDUO())
-  	{
-      duoDriver.setup();
-  		duoDriver.startDUO();
+	/*
+	 *	@brief
+	 *	First see if we can successfully initialize the DUO, then start the DUO
+	 * 	to capture frames from camera. Once the camera is started, ros::spin()
+	 *	is called so that the NodeHandle publishers have a chance to be invoked
+	 * 	and send the images to their topics.
+	 */
+	if (duoDriver.initializeDUO())
+	{
+		duoDriver.setup();
+		duoDriver.startDUO();
 
-  		ros::spin();
-    }
-    else
+		ros::spin();
+	}
+	else
 	{
 
 		ROS_ERROR("Initialization failed. Exiting DUO Node.");

@@ -81,7 +81,7 @@ if __name__ == "__main__":
     with open(os.path.join(duo_path, 'calib', device_serial_nr, lens, resolution, 'cameraParams.yaml'), 'r') as infile:
         cameraParams = yaml.load(infile)
 
-    print('For each axis of the accelerometer and gyroscope you can decide to use the new estimate (answer y), keep the old one (answer n) or manually provide your own (answer o).')
+    print('For each axis of the accelerometer and gyroscope you can decide to use the new estimate (answer y), keep the old one (answer n) or manually provide your own (answer m).')
 
     print('Accelerometer biases:')
     print('Old       \tNew')
@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
     axes = 'XYZ'
     for i in range(3):
-        selection = raw_input('Do you want to use the new accelerometer {} axis estimate? [Y/n/o]: '.format(axes[i]))
+        selection = raw_input('Do you want to use the new accelerometer {} axis estimate? [Y/n/m]: '.format(axes[i]))
         if not selection or selection == 'y' or selection == 'Y':
             cameraParams['acc_bias'][i][0] = last_bias_estimate['acc_bias'][i]
         elif selection == 'o':
@@ -105,7 +105,7 @@ if __name__ == "__main__":
 
     axes = 'XYZ'
     for i in range(3):
-        selection = raw_input('Do you want to use the new gyroscope {} axis estimate? [Y/n/o]: '.format(axes[i]))
+        selection = raw_input('Do you want to use the new gyroscope {} axis estimate? [Y/n/m]: '.format(axes[i]))
         if not selection or selection == 'y' or selection == 'Y':
             cameraParams['gyro_bias'][i][0] = last_bias_estimate['gyro_bias'][i]
         elif selection == 'o':

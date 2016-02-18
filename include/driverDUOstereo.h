@@ -146,6 +146,19 @@ private:
 	bool 	_duoVerticalFlip;
 
 	/*
+	 *	@brief Auto exposure variables
+	 */
+	bool _do_auto_exposure;
+	int _recompute_cnt;
+	int _transition_cnt;
+	double _exposure_change;
+	double _target_brightness;
+	double _controller_gain;
+	int _recompute_delay;
+	int _transition_delay;
+	double _max_step_size;
+
+	/*
 	 *	@params for whether or not to use IMU and/or LED sequences
 	 */
 	bool	_useDUO_Imu;
@@ -248,6 +261,9 @@ private:
 	static DUOStereoDriver* pSingleton;
 
 	void msgProcessedCb(const std_msgs::UInt64 &msg);
+
+	void autoExposure(const PDUOFrame pFrameData);
+
 };
 
 }

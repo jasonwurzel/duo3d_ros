@@ -131,10 +131,11 @@ void DUOStereoDriver::publishImages(const sensor_msgs::ImagePtr image[TWO_CAMERA
 
 void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 {
-
 	// Using singleton to access DUOStereoDriver 
 	// class member functions in this DUO C function
-	DUOStereoDriver& 		duoDriver 	= DUOStereoDriver::GetInstance(); 	
+	DUOStereoDriver& 		duoDriver 	= DUOStereoDriver::GetInstance();
+
+	duoDriver.autoExposure(pFrameData);
 
 	// Array to store left and right images
 	sensor_msgs::ImagePtr 	image[duoDriver.TWO_CAMERAS];	
@@ -345,9 +346,7 @@ bool DUOStereoDriver::initializeDUO()
 			SetDUOGain(_duoInstance, _duoGain);
 			SetDUOLedPWM(_duoInstance, _duoLEDLevel);
 			SetDUOCameraSwap(_duoInstance, _duoCameraSwap); // Switches left and right images
-//#if LINUX_VERSION_CODE == 199940 //corresponds to 3.10.82-duo3d+
 			SetDUOIMURange(_duoInstance, DUO_ACCEL_16G, DUO_GYRO_1000);
-//#endif
 			std::string serialNumberStr;
 			serialNumberStr.append(_duoDeviceSerialNumber, 36);
 
@@ -356,6 +355,16 @@ bool DUOStereoDriver::initializeDUO()
 			_device_serial_nr_pub.publish(serialNrMsg);
 			ROS_INFO("DUO serial number: %s", serialNrMsg.data.c_str());
 
+			// auto exposure parameters
+			_priv_nh.param("auto_exposure"		, _do_auto_exposure	, false);
+			_priv_nh.param("auto_exposure_target_brightness"		, _target_brightness	, 125.0);
+			_priv_nh.param("auto_exposure_controller_gain"		, _controller_gain	, 1.0);
+			double tmp;
+			_priv_nh.param("auto_exposure_recompute_frequency"	, tmp, 1.0);
+			_recompute_delay = (tmp && tmp <= framesPerSecond) ? framesPerSecond/tmp : 1;
+			_priv_nh.param("auto_exposure_transition_frequency"	, tmp	, 1.0);
+			_transition_delay = (tmp && tmp <= framesPerSecond) ? framesPerSecond/tmp : 1;
+			_priv_nh.param("auto_exposure_max_step_size"			, _max_step_size	, 100.0);
 		}
 		else
 		{
@@ -449,6 +458,42 @@ void DUOStereoDriver::shutdownDUO()
 	ROS_WARN("Shutting down DUO Camera.");
 	StopDUO(_duoInstance);
 	CloseDUO(_duoInstance);
+}
+
+void DUOStereoDriver::autoExposure(const PDUOFrame pFrameData)
+{
+	if (!_do_auto_exposure)
+		return;
+
+	_recompute_cnt++;
+	_transition_cnt++;
+
+	if (!(_recompute_cnt % _recompute_delay))
+	{
+		double current_mean = 0;
+
+		for (int i = 0; i < pFrameData->width*pFrameData->height; i++)
+		{
+			current_mean += pFrameData->leftData[i] + pFrameData->rightData[i];
+		}
+		current_mean /= 2*pFrameData->width*pFrameData->height;
+
+		_exposure_change = -_controller_gain * (current_mean - _target_brightness);
+	}
+
+	if (!(_transition_cnt % _transition_delay) || !(_recompute_cnt % _recompute_delay))
+	{
+//		printf("exposure_change %.03f ", _exposure_change);
+		double exposure_change_actual = std::max(-_max_step_size, std::min(_max_step_size, _exposure_change));
+		_exposure_change -= exposure_change_actual;
+
+		double current_exposure;
+		GetDUOExposure(_duoInstance, &current_exposure);
+		SetDUOExposure(_duoInstance, current_exposure + exposure_change_actual);
+		GetDUOExposure(_duoInstance, &current_exposure); // for debug output
+//		printf("exposure_change_actual %.03f exposure %.03f\n", exposure_change_actual, current_exposure);
+	}
+
 }
 
 } // end namespace duoStereo_driver

@@ -481,11 +481,19 @@ void DUOStereoDriver::autoExposure(const PDUOFrame pFrameData)
 	if (!(_transition_cnt % _transition_delay) || !(_recompute_cnt % _recompute_delay))
 	{
 		double exposure_change_actual = std::max(-_max_step_size, std::min(_max_step_size, _exposure_change));
-		_exposure_change -= exposure_change_actual;
 
 		double current_exposure;
 		GetDUOExposure(_duoInstance, &current_exposure);
-		SetDUOExposure(_duoInstance, current_exposure + exposure_change_actual);
+		if (current_exposure > 98 || current_exposure < 2)
+		{
+			exposure_change_actual /= 10;
+			if (current_exposure > 99 || current_exposure < 1)
+				exposure_change_actual = std::max(-0.1, std::min(0.1, exposure_change_actual));
+		}
+		_exposure_change -= exposure_change_actual;
+		double new_exposure = current_exposure + exposure_change_actual;
+		new_exposure = std::max(0.0, std::min(100.0, new_exposure));
+		SetDUOExposure(_duoInstance, new_exposure);
 	}
 
 }

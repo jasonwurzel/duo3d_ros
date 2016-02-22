@@ -9,7 +9,7 @@
     <arg name="auto_exposure" default="true" />
     <arg name="auto_exposure_target_brightness" default="80" />
     <arg name="auto_exposure_controller_gain" default="0.05" />
-    <arg name="auto_exposure_recompute_frequency" default="1" />
+    <arg name="auto_exposure_recompute_frequency" default="5" />
     <arg name="auto_exposure_transition_frequency" default="10" />
     <arg name="auto_exposure_max_step_size" default="2" />
 

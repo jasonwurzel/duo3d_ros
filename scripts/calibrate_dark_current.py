@@ -1,13 +1,11 @@
 #!/usr/bin/python
 from __future__ import print_function, division
-import yaml
-import sys
 import os
 import rospy
 from vio_ros.msg import VioSensorMsg
 from std_msgs.msg import String
 import rospkg
-from cv_bridge import CvBridge, CvBridgeError
+from cv_bridge import CvBridge
 import cv2
 import numpy as np
 
@@ -22,10 +20,8 @@ def vio_sensor_cb(data):
         active = 0
         return
 
-    left = CvBridge().imgmsg_to_cv2(data.left_image, "mono8")
-    left = np.float32(left)#/256.0
-    right = CvBridge().imgmsg_to_cv2(data.right_image, "mono8")
-    right = np.float32(right)#/256.0
+    left = np.float32(CvBridge().imgmsg_to_cv2(data.left_image, "mono8"))
+    right = np.float32(CvBridge().imgmsg_to_cv2(data.right_image, "mono8"))
 
     if cnt == 0:
         imgs['l'] = left

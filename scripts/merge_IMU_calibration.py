@@ -67,7 +67,7 @@ if __name__ == "__main__":
         resolution = resolutions[0]
     else:
         print('Found several resolutions:')
-        for i, resolution in enumerate(resolution):
+        for i, resolution in enumerate(resolutions):
             print('{}: {}'.format(i+1, resolution))
         selection = int(raw_input('Select the resolution you want by providing the appropriate number: '))
         if selection < 1 or selection > len(resolutions):

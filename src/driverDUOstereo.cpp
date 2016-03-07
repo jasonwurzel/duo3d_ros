@@ -39,7 +39,7 @@ DUOStereoDriver::DUOStereoDriver(void):
 	_combined_pub =_camera_nh.advertise<vio_ros::VioSensorMsg>("/vio_sensor", 100);
 	_temp_pub = _camera_nh.advertise<sensor_msgs::Temperature>("cam_temp",1);
 
-	_msg_processed_sub = _camera_nh.subscribe("/duo3d/msg_processed", 100, &DUOStereoDriver::msgProcessedCb, this);
+	_msg_processed_sub = _camera_nh.subscribe("/vio_sensor/msg_processed", 100, &DUOStereoDriver::msgProcessedCb, this);
 	_device_serial_nr_pub = _camera_nh.advertise<std_msgs::String>("/vio_sensor/device_serial_nr", 1, true);
 	_queue_size_pub = _camera_nh.advertise<std_msgs::UInt64>("queue_size", 100);
 }

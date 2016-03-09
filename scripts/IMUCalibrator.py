@@ -10,78 +10,35 @@ import rospkg
 
 
 def vio_sensor_cb(data):
-    global active_axis, gyr, acc, cnt, active, user_ready
+    global gyr, acc, cnt, active, user_ready
 
     if not user_ready:
         return
-    num_samples = 500  # number of IMU samples per axis
+    num_samples = 1000  # number of IMU samples to capture
 
-    cnt += 1
-    if active_axis == 0:  # gyro
-        for imu in data.imu:
-            gyr['x'].append(imu.angular_velocity.x)
-            gyr['y'].append(imu.angular_velocity.y)
-            gyr['z'].append(imu.angular_velocity.z)
+    for imu in data.imu:
+        gyr['x'].append(imu.angular_velocity.x)
+        gyr['y'].append(imu.angular_velocity.y)
+        gyr['z'].append(imu.angular_velocity.z)
 
-        if cnt == num_samples:
-            gyr['x'] = sum(gyr['x'])/len(gyr['x'])
-            gyr['y'] = sum(gyr['y'])/len(gyr['y'])
-            gyr['z'] = sum(gyr['z'])/len(gyr['z'])
-            print('done. {} {} {}'.format(gyr['x'], gyr['y'], gyr['z']))
-            print('\nCalibrating positive X axis. Place the device such that this axis points down.')
-    elif active_axis == 1:  # acc_x+
-        for imu in data.imu:
-            acc['xp'].append(imu.linear_acceleration.x + 9.81)
+        acc['x'].append(imu.linear_acceleration.x)
+        acc['y'].append(imu.linear_acceleration.y + 9.81)
+        acc['z'].append(imu.linear_acceleration.z)
 
-        if cnt == num_samples:
-            acc['xp'] = sum(acc['xp'])/len(acc['xp'])
-            print('done. {}'.format(acc['xp']))
-            print('\nCalibrating negative X axis. Place the device such that this axis points down.')
-    elif active_axis == 2:  # acc_x-
-        for imu in data.imu:
-            acc['xn'].append(imu.linear_acceleration.x - 9.81)
+        cnt += 1
 
-        if cnt == num_samples:
-            acc['xn'] = sum(acc['xn'])/len(acc['xn'])
-            print('done. {}'.format(acc['xn']))
-            print('\nCalibrating positive Y axis. Place the device such that this axis points down.')
-    elif active_axis == 3:  # acc_y+
-        for imu in data.imu:
-            acc['yp'].append(imu.linear_acceleration.y + 9.81)
+    if cnt >= num_samples:
+        gyr['x'] = sum(gyr['x'])/len(gyr['x'])
+        gyr['y'] = sum(gyr['y'])/len(gyr['y'])
+        gyr['z'] = sum(gyr['z'])/len(gyr['z'])
 
-        if cnt == num_samples:
-            acc['yp'] = sum(acc['yp'])/len(acc['yp'])
-            print('done. {}'.format(acc['yp']))
-            print('\nCalibrating negative Y axis. Place the device such that this axis points down.')
-    elif active_axis == 4:  # acc_y-
-        for imu in data.imu:
-            acc['yn'].append(imu.linear_acceleration.y - 9.81)
+        acc['x'] = sum(acc['x'])/len(acc['x'])
+        acc['y'] = sum(acc['y'])/len(acc['y'])
+        acc['z'] = sum(acc['z'])/len(acc['z'])
+        print('\nFinished capturing data.')
+        active = 0
 
-        if cnt == num_samples:
-            acc['yn'] = sum(acc['yn'])/len(acc['yn'])
-            print('done. {}'.format(acc['yn']))
-            print('\nCalibrating positive Z axis. Place the device such that this axis points down.')
-    elif active_axis == 5:  # acc_z+
-        for imu in data.imu:
-            acc['zp'].append(imu.linear_acceleration.z + 9.81)
-
-        if cnt == num_samples:
-            acc['zp'] = sum(acc['zp'])/len(acc['zp'])
-            print('done. {}'.format(acc['zp']))
-            print('\nCalibrating negative Z axis. Place the device such that this axis points down.')
-    elif active_axis == 6:  # acc_z-
-        for imu in data.imu:
-            acc['zn'].append(imu.linear_acceleration.z - 9.81)
-
-        if cnt == num_samples:
-            acc['zn'] = sum(acc['zn'])/len(acc['zn'])
-            print('done. {}'.format(acc['zn']))
-
-            print('\nFinished capturing data.')
-            active = 0
-
-    if cnt == num_samples:
-        active_axis += 1
+    if cnt >= num_samples:
         cnt = 0
         user_ready = 0
 
@@ -95,10 +52,9 @@ if __name__ == "__main__":
     rospy.init_node('calibrate_IMU')
 
     gyr = {'x': [], 'y': [], 'z': []}
-    acc = {'xp': [], 'xn': [], 'yp': [], 'yn': [], 'zp': [], 'zn': []}
+    acc = {'x': [], 'y': [], 'z': []}
 
     cnt = 0
-    active_axis = 0  # gyro, acc_x, acc_y, acc_z
     active = 1
     user_ready = 0
     device_serial_nr = None
@@ -106,7 +62,12 @@ if __name__ == "__main__":
     rospy.Subscriber("/vio_sensor", VioSensorMsg, vio_sensor_cb, queue_size=1)
     rospy.Subscriber("/vio_sensor/device_serial_nr", String, device_serial_nr_cb, queue_size=1)
 
-    print('Calibrating gyroscope. Do not move the device')
+    print('Waiting for device serial nr...')
+    while not device_serial_nr:
+        rospy.sleep(0.5)
+    print('... done')
+
+    print('Calibrating IMU. Place the device with zero roll and pitch (i.e. facing horizontally forward). Do not move the device')
     rate = rospy.Rate(100)
     while active and not rospy.is_shutdown():
         if not user_ready:
@@ -116,9 +77,6 @@ if __name__ == "__main__":
         rate.sleep()
     
     if not rospy.is_shutdown():
-        acc['x'] = (acc['xp'] + acc['xn'])/2
-        acc['y'] = (acc['yp'] + acc['yn'])/2
-        acc['z'] = (acc['zp'] + acc['zn'])/2
 
         rospack = rospkg.RosPack()
         duo_path = rospack.get_path('duo3d_ros')
@@ -169,7 +127,12 @@ if __name__ == "__main__":
 
         axes = 'xyz'
         for i in range(3):
-            selection = raw_input('Do you want to use the new accelerometer {} axis estimate? [Y/n]: '.format(axes[i]))
+            try:
+                selection = raw_input('Do you want to use the new accelerometer {} axis estimate? [Y/n]: '.format(axes[i]))
+            except EOFError:
+                print('')
+                sys.exit(-1)
+
             if not selection or selection == 'y' or selection == 'Y':
                 cameraParams['acc_bias'][i][0] = acc[axes[i]]
 
@@ -180,7 +143,12 @@ if __name__ == "__main__":
         print('{0: 6.6f}\t{1: 6.6f}'.format(cameraParams['gyro_bias'][2][0], gyr['z']))
 
         for i in range(3):
-            selection = raw_input('Do you want to use the new gyroscope {} axis estimate? [Y/n/m]: '.format(axes[i]))
+            try:
+                selection = raw_input('Do you want to use the new gyroscope {} axis estimate? [Y/n]: '.format(axes[i]))
+            except EOFError:
+                print('')
+                sys.exit(-1)
+
             if not selection or selection == 'y' or selection == 'Y':
                 cameraParams['gyro_bias'][i][0] = gyr[axes[i]]
 

@@ -45,7 +45,6 @@ class DUOCalibrator(QMainWindow):
 
         self.res_height = 0
         self.res_width = 0
-        # self.lens = 'FS3028B13M8'  # todo: this should not be hardcoded
         self.chb_dimensions_spin = None
         self.start_calib_btn = None
         self.lens_type_le = None
@@ -296,9 +295,9 @@ class DUOCalibrator(QMainWindow):
 
         self.recording = False
 
-        min_frames = 3
+        min_frames = 10
         if len(self.corners['left']) < min_frames:
-            QMessageBox.warning(self, "Not enough images",
+            QMessageBox.error(self, "Not enough images",
                                         """You have not recorded enough images of the checkerboard. Please record at least {} images to calibrate""".format(min_frames),
                                         QMessageBox.Ok)
             return

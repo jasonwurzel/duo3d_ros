@@ -20,7 +20,7 @@
 #include <image_transport/image_transport.h>
 #include <camera_info_manager/camera_info_manager.h>
 
-#include "vio_ros/VioSensorMsg.h"
+#include "ait_ros_messages/VioSensorMsg.h"
 
 #include <dynamic_reconfigure/server.h>
 #include <duo3d_ros/DuoConfig.h>
@@ -237,7 +237,7 @@ private:
 
 	void publishImuData(const sensor_msgs::Imu &img_msg);
 
-	void publishCombinedData(const vio_ros::VioSensorMsg &combined_msg);
+	void publishCombinedData(const ait_ros_messages::VioSensorMsg &combined_msg);
 
 	void publishTempData(const sensor_msgs::Temperature &temp_msg);
 

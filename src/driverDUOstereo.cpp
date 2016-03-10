@@ -36,7 +36,7 @@ DUOStereoDriver::DUOStereoDriver(void):
 	}
 
 	_pub = _camera_nh.advertise<sensor_msgs::Imu>("cam_imu", 5);
-	_combined_pub =_camera_nh.advertise<vio_ros::VioSensorMsg>("/vio_sensor", 100);
+	_combined_pub =_camera_nh.advertise<ait_ros_messages::VioSensorMsg>("/vio_sensor", 100);
 	_temp_pub = _camera_nh.advertise<sensor_msgs::Temperature>("cam_temp",1);
 
 	_msg_processed_sub = _camera_nh.subscribe("/vio_sensor/msg_processed", 100, &DUOStereoDriver::msgProcessedCb, this);
@@ -154,7 +154,7 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 	// Imu stuff
 	sensor_msgs::Imu imu_msg;
 
-	vio_ros::VioSensorMsg combined_msg;
+	ait_ros_messages::VioSensorMsg combined_msg;
 
 	for (int i = 0; i < pFrameData->IMUSamples; i++)
 	{
@@ -189,7 +189,7 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 	}
 }
 
-void DUOStereoDriver::publishCombinedData(const vio_ros::VioSensorMsg &combined_msg)
+void DUOStereoDriver::publishCombinedData(const ait_ros_messages::VioSensorMsg &combined_msg)
 {
 	_combined_pub.publish(combined_msg);
 //	ROS_INFO("Sending message %d", combined_msg.id.data);

@@ -1,9 +1,10 @@
 <launch>
     <arg name="exposure" default="50" />
     <arg name="gain" default="100" />
-    <arg name="FPS" default="50" />
-    <arg name="resolution_width" default="320" />
-    <arg name="resolution_height" default="240" />
+    <arg name="FPS" default="20" />
+    <arg name="imu_rate" default="200" />    
+    <!--arg name="resolution_width" default="640" />
+    <arg name="resolution_height" default="480" /-->
     <arg name="publish_raw" default="1" />
 
     <arg name="auto_exposure" default="true" />
@@ -34,10 +35,12 @@
 
 		-->	
 		<param name="FPS"   value="$(arg FPS)" />
+		<param name="ImuRate"   value="$(arg imu_rate)" />
 
 		<param name="resolution_width"	value="$(arg resolution_width)" />
 		<param name="resolution_height"	value="$(arg resolution_height)" />
-
+	    <param name="activate_undistort"   	value="true" />	    
+	    <param name="activate_undistort"   	value="true" />	    
 
 		<param name="exposure"      value="$(arg exposure)"  />
 		<param name="gain"          value="$(arg gain)"  /> 
@@ -63,6 +66,20 @@
 		<param name="auto_exposure_recompute_frequency"   value="$(arg auto_exposure_recompute_frequency)" />
 		<param name="auto_exposure_transition_frequency"   value="$(arg auto_exposure_transition_frequency)" />
 		<param name="auto_exposure_max_step_size"   value="$(arg auto_exposure_max_step_size)" />
+
+<!--okvis ?-->
+		<!--remap from="/duo3d_camera/left/image_raw" to="/cam0/image_raw" />
+    	<remap from="/duo3d_camera/right/image_raw" to="/cam1/image_raw" />
+    	<remap from="/calibration0" to="/cam0/calibration" />
+    	<remap from="/calibration1" to="/cam1/calibration" />
+    	<remap from="/duo3d_camera/cam_imu" to="/imu0" /-->
+
+<!--rovio-->
+		<remap from="/duo3d_camera/left/image_raw" to="/cam0/image_raw" />
+    	<remap from="/duo3d_camera/right/image_raw" to="/cam1/image_raw" />
+    	<remap from="/calibration0" to="/cam0/calibration" />
+    	<remap from="/calibration1" to="/cam1/calibration" />
+    	<remap from="/duo3d_camera/cam_imu" to="/imu0" />
 
     </node>
 

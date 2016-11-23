@@ -35,7 +35,7 @@ DUOStereoDriver::DUOStereoDriver(void):
 		_imagePub[i] 			= _it->advertiseCamera(CameraNames[i]+"/image_raw", 1);
 	}
 
-	_pub = _camera_nh.advertise<sensor_msgs::Imu>("cam_imu", 5);
+	_pub = _camera_nh.advertise<sensor_msgs::Imu>("cam_imu", 10);
 	_combined_pub =_camera_nh.advertise<ait_ros_messages::VioSensorMsg>("/vio_sensor", 100);
 	_temp_pub = _camera_nh.advertise<sensor_msgs::Temperature>("cam_temp",1);
 
@@ -54,6 +54,7 @@ DUOStereoDriver::~DUOStereoDriver(void)
 void DUOStereoDriver::fillDUOImages(sensor_msgs::Image& leftImage, sensor_msgs::Image& rightImage, const PDUOFrame pFrameData)
 {
 
+	//leftImage.header.stamp 		= ros::Time::now();
 	leftImage.header.stamp 		= ros::Time( double(pFrameData->timeStamp) * 1.e-4);
 	leftImage.header.frame_id 	= _camera_frame;
 	rightImage.header.stamp 	= leftImage.header.stamp;
@@ -155,18 +156,27 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 	sensor_msgs::Imu imu_msg;
 
 	ait_ros_messages::VioSensorMsg combined_msg;
-
+	
 	for (int i = 0; i < pFrameData->IMUSamples; i++)
 	{
-		imu_msg.angular_velocity.x = +pFrameData->IMUData[i].gyroData[0];
-		imu_msg.angular_velocity.y = -pFrameData->IMUData[i].gyroData[1];
-		imu_msg.angular_velocity.z = +pFrameData->IMUData[i].gyroData[2];
+		imu_msg.header.stamp = ros::Time( double(pFrameData->IMUData[i].timeStamp) * 1.e-4);
+		imu_msg.angular_velocity.x = pFrameData->IMUData[i].gyroData[0]*0.0174532925; // +
+		imu_msg.angular_velocity.y = pFrameData->IMUData[i].gyroData[1]*0.0174532925; // -
+		imu_msg.angular_velocity.z = pFrameData->IMUData[i].gyroData[2]*0.0174532925; // +
 
-		imu_msg.linear_acceleration.x = +pFrameData->IMUData[i].accelData[0]*9.81;
-		imu_msg.linear_acceleration.y = -pFrameData->IMUData[i].accelData[1]*9.81;
-		imu_msg.linear_acceleration.z = -pFrameData->IMUData[i].accelData[2]*9.81;
+		imu_msg.linear_acceleration.x = pFrameData->IMUData[i].accelData[0]*9.80665; // +
+		imu_msg.linear_acceleration.y = pFrameData->IMUData[i].accelData[1]*9.80665; // -
+		imu_msg.linear_acceleration.z = pFrameData->IMUData[i].accelData[2]*9.80665; // -
 
 		combined_msg.imu.push_back(imu_msg);
+
+		if (duoDriver._publish_raw)
+		{	
+			//ROS_INFO_STREAM("IMU timeStamp: " << imu_msg.header.stamp);
+			//imu_msg.header.stamp = ros::Time::now();
+			//imu_msg.header.stamp = ros::Time( double(pFrameData->timeStamp) * 1.e-4);
+			duoDriver.publishImuData(imu_msg);
+		}
 	}
 
 	imu_msg.header.stamp = ros::Time( double(pFrameData->timeStamp) * 1.e-4);
@@ -184,7 +194,7 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 	if (duoDriver._publish_raw)
 	{
 		duoDriver.publishImages(image);
-		duoDriver.publishImuData(imu_msg);
+		// duoDriver.publishImuData(imu_msg);
 		duoDriver.publishTempData(temp_msg);
 	}
 }
@@ -208,7 +218,7 @@ void DUOStereoDriver::publishTempData(const sensor_msgs::Temperature &temp_msg)
 bool DUOStereoDriver::initializeDUO()
 {
 	// Implement libCheck() later to tell user they need to update their DUO SDK
-	ROS_INFO("DUOLib Version: %s", GetLibVersion());
+	ROS_INFO("DUOLib Version: %s", GetDUOLibVersion());
 
 
 	std::string 	deviceName;
@@ -258,6 +268,7 @@ bool DUOStereoDriver::initializeDUO()
 	 */
 	double	framesPerSecond;
 	_priv_nh.param("FPS", framesPerSecond, 30.0);
+	_priv_nh.param("ImuRate", _imuRate, 100.0);
 
 
 	/* 
@@ -311,18 +322,22 @@ bool DUOStereoDriver::initializeDUO()
 //		ROS_ERROR("Calibration URL is invalid.");
 //		ROS_WARN("Will continue to publish uncalibrated images!");
 //	}
+	bool* test;
+	GetDUOUndistort(_duoInstance, test);
+	ROS_INFO_STREAM("undistort: " << test);
 
 	_priv_nh.param<bool>("HorizontalFlip", _horizontal_flip, false);
 	_priv_nh.param<bool>("VerticalFlip", _vertical_flip, false);
 	_priv_nh.param<bool>("CameraSwap", _duoCameraSwap, false);
 	_priv_nh.param<bool>("publish_raw", _publish_raw, false);
-
+	_priv_nh.param("activate_undistort", _duoActivate_undistort,	false);
+	
 	/*
 	 * @brief
 	 * Select 752x480 resolution with no binning capturing at 30FPS
 	 * These values (width, height, FPS) should be ROS Params
 	 */
-	if(EnumerateResolutions(&_duoResolutionInfo, 1, resWidth, resHeight, binning, framesPerSecond))
+	if(EnumerateDUOResolutions(&_duoResolutionInfo, 1, resWidth, resHeight, binning, framesPerSecond))
 	{
 		ROS_INFO("Resolution Parameters Check: PASSED");
 
@@ -334,7 +349,6 @@ bool DUOStereoDriver::initializeDUO()
 			GetDUOFirmwareBuild(	_duoInstance, _duoDeviceFirmwareBuild);
 			SetDUOResolutionInfo( 	_duoInstance, _duoResolutionInfo);
 
-
 			_priv_nh.param("exposure"		, _duoExposure	, 50.0);
 			_priv_nh.param("gain"			, _duoGain 		, 50.0);
 			_priv_nh.param("led_lighting"	, _duoLEDLevel	, 0.0);
@@ -345,6 +359,9 @@ bool DUOStereoDriver::initializeDUO()
 			SetDUOLedPWM(_duoInstance, _duoLEDLevel);
 			SetDUOCameraSwap(_duoInstance, _duoCameraSwap); // Switches left and right images
 			SetDUOIMURange(_duoInstance, DUO_ACCEL_16G, DUO_GYRO_1000);
+			//SetDUOUndistort(_duoInstance, _duoActivate_undistort);
+			SetDUOIMURate(_duoInstance, _imuRate);
+
 			std::string serialNumberStr;
 			serialNumberStr.append(_duoDeviceSerialNumber, 36);
 
@@ -422,6 +439,12 @@ void DUOStereoDriver::dynamicCallback(duo3d_ros::DuoConfig &config, uint32_t lev
 		_duoVerticalFlip = config.VerticalFlip;
 		SetDUOVFlip(_duoInstance, _duoVerticalFlip);
 	}
+
+//	if(_duoActivate_undistort != config.ActivateUndistort)
+//	{
+//		_duoActivate_undistort = config.ActivateUndistort;
+//		SetDUOUndistort(_duoInstance, _duoActivate_undistort);
+//	}
 
 }
 

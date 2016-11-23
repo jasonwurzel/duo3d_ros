@@ -144,6 +144,8 @@ private:
 	bool 	_duoCameraSwap;
 	bool 	_duoHorizontalFlip;
 	bool 	_duoVerticalFlip;
+	bool 	_duoActivate_undistort;	
+	double 	_imuRate;
 
 	/*
 	 *	@brief Auto exposure variables

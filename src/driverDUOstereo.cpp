@@ -161,12 +161,12 @@ void CALLBACK DUOCallback(const PDUOFrame pFrameData, void *pUserData)
 	{
 		imu_msg.header.stamp = ros::Time( double(pFrameData->IMUData[i].timeStamp) * 1.e-4);
 		imu_msg.angular_velocity.x = pFrameData->IMUData[i].gyroData[0]*0.0174532925; // +
-		imu_msg.angular_velocity.y = pFrameData->IMUData[i].gyroData[1]*0.0174532925; // -
+		imu_msg.angular_velocity.y = -pFrameData->IMUData[i].gyroData[1]*0.0174532925; // -
 		imu_msg.angular_velocity.z = pFrameData->IMUData[i].gyroData[2]*0.0174532925; // +
 
 		imu_msg.linear_acceleration.x = pFrameData->IMUData[i].accelData[0]*9.80665; // +
-		imu_msg.linear_acceleration.y = pFrameData->IMUData[i].accelData[1]*9.80665; // -
-		imu_msg.linear_acceleration.z = pFrameData->IMUData[i].accelData[2]*9.80665; // -
+		imu_msg.linear_acceleration.y = -pFrameData->IMUData[i].accelData[1]*9.80665; // -
+		imu_msg.linear_acceleration.z = -pFrameData->IMUData[i].accelData[2]*9.80665; // -
 
 		combined_msg.imu.push_back(imu_msg);
 
@@ -306,22 +306,22 @@ bool DUOStereoDriver::initializeDUO()
 
 
 	// set camera_info_url using launch file
-//	std::string camera_info_url_left, camera_info_url_right;
-//	_priv_nh.param<std::string>("camera_info_left", camera_info_url_left, "");
-//	_priv_nh.param<std::string>("camera_info_right", camera_info_url_right, "");
-//
-//	if( _cinfo[0]->validateURL( camera_info_url_left ) && _cinfo[1]->validateURL( camera_info_url_right ) )
-//	{
-//		_cinfo[0]->loadCameraInfo( camera_info_url_left );
-//		_cinfo[1]->loadCameraInfo( camera_info_url_right );
-//
-//		ROS_INFO("custom DUO calibration files loaded");
-//	}
-//	else
-//	{
-//		ROS_ERROR("Calibration URL is invalid.");
-//		ROS_WARN("Will continue to publish uncalibrated images!");
-//	}
+	std::string camera_info_url_left, camera_info_url_right;
+	_priv_nh.param<std::string>("camera_info_left", camera_info_url_left, "");
+	_priv_nh.param<std::string>("camera_info_right", camera_info_url_right, "");
+
+	if( _cinfo[0]->validateURL( camera_info_url_left ) && _cinfo[1]->validateURL( camera_info_url_right ) )
+	{
+		_cinfo[0]->loadCameraInfo( camera_info_url_left );
+		_cinfo[1]->loadCameraInfo( camera_info_url_right );
+
+		ROS_INFO("custom DUO calibration files loaded");
+	}
+	else
+	{
+		ROS_ERROR("Calibration URL is invalid.");
+		ROS_WARN("Will continue to publish uncalibrated images!");
+	}
 	bool* test;
 	GetDUOUndistort(_duoInstance, test);
 	ROS_INFO_STREAM("undistort: " << test);

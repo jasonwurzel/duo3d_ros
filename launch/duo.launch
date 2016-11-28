@@ -3,8 +3,8 @@
     <arg name="gain" default="100" />
     <arg name="FPS" default="20" />
     <arg name="imu_rate" default="200" />    
-    <!--arg name="resolution_width" default="640" />
-    <arg name="resolution_height" default="480" /-->
+    <arg name="resolution_width" default="640" />
+    <arg name="resolution_height" default="480" />
     <arg name="publish_raw" default="1" />
 
     <arg name="auto_exposure" default="true" />
@@ -57,8 +57,8 @@
 
 	    <!-- NOTE: to set the calibration manually you'll need to have the "ost.txt" file from the ros calibration. then you convert (use http://wiki.ros.org/camera_calibration_parsers) it to two separate files and put it into the calibration folder -->
 
-	    <param name="camera_info_left" value="file://$(find duo3d_ros)/calibration/duo3d_left.yaml" />
-	    <param name="camera_info_right" value="file://$(find duo3d_ros)/calibration/duo3d_right.yaml" />
+	    <param name="camera_info_left" value="file://$(find duo3d_ros)/calibration/duo3d_left_640_480.yaml" />
+	    <param name="camera_info_right" value="file://$(find duo3d_ros)/calibration/duo3d_right_640_480.yaml" />
 
 		<param name="auto_exposure"   value="$(arg auto_exposure)" />
 		<param name="auto_exposure_target_brightness"   value="$(arg auto_exposure_target_brightness)" />
@@ -75,6 +75,13 @@
     	<remap from="/duo3d_camera/cam_imu" to="/imu0" /-->
 
 <!--rovio-->
+		<!--remap from="/duo3d_camera/left/image_raw" to="/cam0/image_raw" />
+    	<remap from="/duo3d_camera/right/image_raw" to="/cam1/image_raw" />
+    	<remap from="/calibration0" to="/cam0/calibration" />
+    	<remap from="/calibration1" to="/cam1/calibration" />
+    	<remap from="/duo3d_camera/cam_imu" to="/imu0" /-->
+
+<!--rcars-->
 		<remap from="/duo3d_camera/left/image_raw" to="/cam0/image_raw" />
     	<remap from="/duo3d_camera/right/image_raw" to="/cam1/image_raw" />
     	<remap from="/calibration0" to="/cam0/calibration" />
